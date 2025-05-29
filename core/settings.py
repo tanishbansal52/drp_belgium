@@ -136,6 +136,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS settings
 CORS_ORIGIN_WHITELIST = [
-  '*'  # Vercel frontend URL
+  'https://drp-france.vercel.app', # Vercel frontend URL
+  'http://localhost:5173', # Local development URL
 ]
-CORS_ALLOW_CREDENTIALS = True

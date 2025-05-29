@@ -139,3 +139,6 @@ CORS_ORIGIN_WHITELIST = [
   'https://drp-france.vercel.app', # Vercel frontend URL
   'http://localhost:5173', # Local development URL
 ]
+
+# CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True

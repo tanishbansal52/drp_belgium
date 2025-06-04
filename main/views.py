@@ -24,6 +24,7 @@ def simple_json_view(request):
     return JsonResponse({
         'question_id': question.id,
         'question_text': question.question_text,
+        'answer': question.answer,
         'points': question.points,
         'quiz': question.quiz.title
     })

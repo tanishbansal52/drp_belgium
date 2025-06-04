@@ -39,8 +39,8 @@ def submit_answer(request):
     answer = data.get('answer')
 
     try:
-        group = Group.objects.get(id=group_id)
         question = Question.objects.get(id=question_id)
+        group = Group.objects.get(group_id=group_id)
     except (Group.DoesNotExist, Question.DoesNotExist):
         return JsonResponse({'error': 'Group or Question not found'}, status=404)
 

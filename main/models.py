@@ -47,9 +47,10 @@ class Room(models.Model):
         return self.room_code
 
 class Group(models.Model):
+    group_id = models.AutoField(primary_key=True)
     room = models.ForeignKey(Room, db_column='room_id', on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    current_score = models.IntegerField(default=0)
+    name = models.CharField(max_length=100, db_column='group_name')
+    curr_score = models.IntegerField(default=0, db_column='curr_score')
 
     def __str__(self):
         return self.name

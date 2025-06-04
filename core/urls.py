@@ -28,5 +28,5 @@ urlpatterns = [
     path('api/add-room/', add_room, name='add-room-api'),
     path('api/update-room-status/', update_room_status, name='update-room-status-api'),
     path('api/get-room-status/<str:room_code>/', get_room_status, name='get-room-status-api'),
-    path('api/get/rooms/', get_room_status, name='get-rooms-api'),
+    path('api/get-rooms/', get_room_status, name='get-rooms-api'),
 ]

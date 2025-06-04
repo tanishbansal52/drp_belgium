@@ -108,3 +108,54 @@ def join_room(request):
     
     return Response({"group_id": group.id,
         "room_code": room.code, 'message': 'Group created successfully'}, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def add_room(request):
+    room_code = request.data.get('room_code')
+
+    if not room_code:
+        return Response({"error": "Missing room_code"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    room, created = Room.objects.get_or_create(room_code=room_code, quiz=1, curr_number=0)
+    if not created:
+        return Response({'error': 'Room already exists'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    return Response({"room_id": room.id, "room_code": room.room_code, 'message': 'Room created successfully'}, status=status.HTTP_201_CREATED)
+
+
+@api_view(['POST'])
+def update_room_status(request):
+    room_code = request.data.get('room_code')
+    new_status = request.data.get('status')
+
+    if not room_code or new_status is None:
+        return Response({"error": "Missing room_code or status"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        room = Room.objects.get(room_code=room_code)
+    except Room.DoesNotExist:
+        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    room.curr_number = new_status
+
+    room.save()
+    return Response({"room_id": room.id, "room_code": room.room_code, "status": room.curr_number, "message": "Room status updated"}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_room_status(request, room_code):
+    try:
+        room = Room.objects.get(room_code=room_code)
+    except Room.DoesNotExist:
+        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    return Response({
+        "room_id": room.room_id,
+        "room_code": room.room_code,
+        "status": room.curr_number,
+    }, status=status.HTTP_200_OK)
+
+
+
+
+
+

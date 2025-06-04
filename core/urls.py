@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views import simple_json_view, submit_answer, join_room, give_questions
+from main.views import simple_json_view, submit_answer, join_room, give_questions, add_room, update_room_status, get_room_status
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,5 +24,8 @@ urlpatterns = [
     path('api/submit/', submit_answer),
     path('api/join-room/', join_room),
     path('api/data', simple_json_view, name='simple-data-api'),  # This seems to be a duplicate, consider removing it
-    path('api/questions', give_questions, name='give-questions-api')
+    path('api/questions', give_questions, name='give-questions-api'),
+    path('api/add-room/', add_room, name='add-room-api'),
+    path('api/update-room-status/', update_room_status, name='update-room-status-api'),
+    path('api/get-room-status/<str:room_code>/', get_room_status, name='get-room-status-api'),
 ]

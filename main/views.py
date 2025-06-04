@@ -3,8 +3,12 @@ from .models import UserProfile, Quiz
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Room, Group
 import json
-from .models import Response, Group, Question
+from .models import GroupResponse, Group, Question
 
 # Create your views here.
 # def simple_json_view(request):
@@ -48,7 +52,7 @@ def submit_answer(request):
     points_earned = question.points if is_correct else 0
 
     # Save the response
-    Response.objects.create(
+    GroupResponse.objects.create(
         group=group,
         question=question,
         answer=answer,
@@ -67,3 +71,23 @@ def submit_answer(request):
         'points_earned': points_earned,
         'total_score': group.current_score
     })
+
+@api_view(['POST'])
+def join_room(request):
+    room_code = request.data.get('room_code')
+    group_name = request.data.get('group_name')
+
+    if not room_code or not group_name:
+        return Response({"error": "Missing fields"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        room = Room.objects.get(room_code=room_code)
+    except Room.DoesNotExist:
+        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    group, created = Group.objects.get_or_create(name=group_name, room=room)
+    if not created:
+        return Response({'error': 'Group already exists for this room'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    return Response({"group_id": group.id,
+        "room_code": room.code, 'message': 'Group created successfully'}, status=status.HTTP_201_CREATED)

@@ -37,6 +37,7 @@ class Question(models.Model):
         managed = False
 
 class Room(models.Model):
+    room_id = models.AutoField(primary_key=True)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, db_column='quiz_id')
     room_code = models.TextField(unique=True)
     status = models.CharField(max_length=20, choices=[('waiting', 'Waiting'), ('active', 'Active'), ('finished', 'Finished')], default='waiting')
@@ -45,8 +46,13 @@ class Room(models.Model):
 
     def __str__(self):
         return self.room_code
+    
+    class Meta:
+        db_table = 'rooms'
+        managed = False
 
 class Group(models.Model):
+    group_id = models.AutoField(primary_key=True)
     room = models.ForeignKey(Room, db_column='room_id', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     current_score = models.IntegerField(default=0)
@@ -58,7 +64,8 @@ class Group(models.Model):
         db_table = 'groups'
         managed = False
 
-class Response(models.Model):
+class GroupResponse(models.Model):
+    resp_id = models.AutoField(primary_key=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, db_column='group_id')
     question = models.ForeignKey(Question, on_delete=models.CASCADE, db_column='question_id')
     answer = models.TextField()

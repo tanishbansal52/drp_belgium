@@ -16,9 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views import simple_json_view
+from main.views import simple_json_view, submit_answer
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/data/', simple_json_view, name='simple-data-api')
+    path('api/data/', simple_json_view, name='simple-data-api'),
+    path('api/submit/', submit_answer),
 ]

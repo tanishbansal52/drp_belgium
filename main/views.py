@@ -123,6 +123,12 @@ def add_room(request):
     return Response({"room_id": room.id, "room_code": room.room_code, 'message': 'Room created successfully'}, status=status.HTTP_201_CREATED)
 
 
+@api_view(['GET'])
+def get_rooms(request):
+    rooms = Room.objects.all()
+    room_list = [{"room_id": room.id, "room_code": room.room_code, "status": room.curr_number} for room in rooms]
+    return Response(room_list, status=status.HTTP_200_OK)
+
 @api_view(['POST'])
 def update_room_status(request):
     room_code = request.data.get('room_code')

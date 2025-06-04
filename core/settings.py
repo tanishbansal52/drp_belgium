@@ -82,13 +82,13 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'drpdatabase',
+        'USER': 'drpdatabase_user',
+        'PASSWORD': 'StfK8XTysePmY3PT2xnKJgggPVZcslss',
+        'HOST': 'dpg-d0rp6095pdvs738sc0f0-a.oregon-postgres.render.com',  # Full hostname
+        'PORT': '5432',
     }
-    # 'default': dj_database_url.config(
-    #     default= os.environ.get('DATABASE_URL'),
-    #     conn_max_age=600
-    # )
 }
 
 

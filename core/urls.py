@@ -20,6 +20,6 @@ from main.views import simple_json_view, submit_answer
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/data/', simple_json_view, name='simple-data-api'),
+   path('api/questions/<int:n>/', simple_json_view, name='simple-data-api'),
     path('api/submit/', submit_answer),
 ]

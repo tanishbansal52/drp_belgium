@@ -15,14 +15,15 @@ from .models import Response, Group, Question
     # quizname = Quiz.objects.first().title if Quiz.objects.exists() else "No quizzes available"
     # return JsonResponse({'question': '5x = 0. What is x = ?', 'quiz': quizname}, safe=False)
 
-def simple_json_view(request):
-    question = Question.objects.first()  # later use current question from room
-
+def simple_json_view(request, n):
+    questions = list(Question.objects.all())  # later use current question from room
+    question = questions[n] if questions else None
     if not question:
         return JsonResponse({'error': 'No question available'}, status=404)
 
     return JsonResponse({
         'question_id': question.id,
+        'answer': question.answer,
         'question_text': question.question_text,
         'points': question.points,
         'quiz': question.quiz.title

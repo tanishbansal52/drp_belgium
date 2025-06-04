@@ -36,6 +36,20 @@ def simple_json_view(request, n):
         'quiz': question.quiz.title
     })
 
+def give_questions(request):
+    questions = list(Question.objects.all())
+    if not questions:
+        return JsonResponse({'error': 'No questions available'}, status=404)
+
+    data = [{
+        'question_id': q.id,
+        'question_text': q.question_text,
+        'answer': q.answer,
+        'points': q.points,
+        'quiz': q.quiz.title
+    } for q in questions]
+
+    return JsonResponse(data, safe=False)
 
 @csrf_exempt
 @require_POST

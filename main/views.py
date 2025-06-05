@@ -51,6 +51,22 @@ def give_questions(request):
 
     return JsonResponse(data, safe=False)
 
+@api_view(['GET'])
+def give_quizzes(request):
+    quizzes = list(Quiz.objects.all())
+    if not quizzes:
+        return JsonResponse({'error': 'No quizzes available'}, status=404)
+
+    data = [{
+        'title': q.title,
+        'subject': q.subject,
+        'difficulty': q.difficulty,
+        'total_time': q.total_time,
+        'description': q.description
+    } for q in quizzes]
+
+    return JsonResponse(data, safe=False)
+
 @csrf_exempt
 @require_POST
 def submit_answer(request):

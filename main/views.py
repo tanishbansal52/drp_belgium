@@ -175,6 +175,18 @@ def update_room_status(request):
     room.save()
     return Response({"room_id": room.room_id, "room_code": room.room_code, "status": room.curr_number, "message": "Room status updated"}, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+def get_room_groups(request, room_code):
+    try:
+        room = Room.objects.get(room_code=room_code)
+    except Room.DoesNotExist:
+        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    groups = Group.objects.filter(room=room)
+    group_list = [{"group_id": group.group_id, "name": group.name, "curr_score": group.curr_score} for group in groups]
+    return Response(group_list, status=status.HTTP_200_OK)
+
+
 
 
 

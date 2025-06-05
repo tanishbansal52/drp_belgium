@@ -148,7 +148,7 @@ def can_move_to_next_question(request):
         room = Room.objects.get(room_code=room_code)
     except Room.DoesNotExist:
         return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
-    if room.curr_number == int(curr_status):
+    if room.curr_number > int(curr_status):
         return Response({"can_move": True}, status=status.HTTP_200_OK)
     else:
         return Response({"can_move": False}, status=status.HTTP_200_OK)

@@ -116,7 +116,7 @@ def add_room(request):
     if not room_code:
         return Response({"error": "Missing room_code"}, status=status.HTTP_400_BAD_REQUEST)
     
-    room, created = Room.objects.get_or_create(room_code=room_code, quiz=1, curr_number=0)
+    room, created = Room.objects.get_or_create(room_code=room_code, curr_number=0)
     if not created:
         return Response({'error': 'Room already exists'}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -126,7 +126,7 @@ def add_room(request):
 @api_view(['GET'])
 def get_rooms(request):
     rooms = Room.objects.all()
-    room_list = [{"room_id": room.id, "room_code": room.room_code, "status": room.curr_number} for room in rooms]
+    room_list = [{"room_id": room.room_code, "curr_number": room.curr_number} for room in rooms]
     return Response(room_list, status=status.HTTP_200_OK)
 
 @api_view(['POST'])

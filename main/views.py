@@ -138,6 +138,20 @@ def add_room(request):
     
     return Response({"room_id": room.room_id, "room_code": room.room_code, 'message': 'Room created successfully'}, status=status.HTTP_201_CREATED)
 
+@api_view(['GET'])
+def can_move_to_next_question(request):
+    room_code = request.query_params.get('room_code')
+    curr_status = request.query_params.get('status')
+    if not room_code or curr_status is None:
+        return Response({"error": "Missing room_code or status"}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        room = Room.objects.get(room_code=room_code)
+    except Room.DoesNotExist:
+        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+    if room.curr_number == int(curr_status):
+        return Response({"can_move": True}, status=status.HTTP_200_OK)
+    else:
+        return Response({"can_move": False}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_rooms(request):
@@ -162,20 +176,6 @@ def update_room_status(request):
 
     room.save()
     return Response({"room_id": room.room_id, "room_code": room.room_code, "status": room.curr_number, "message": "Room status updated"}, status=status.HTTP_200_OK)
-
-@api_view(['GET'])
-def get_room_status(request, room_code):
-    try:
-        room = Room.objects.get(room_code=room_code)
-    except Room.DoesNotExist:
-        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
-    
-    return Response({
-        "room_id": room.room_id,
-        "room_code": room.room_code,
-        "status": room.curr_number,
-    }, status=status.HTTP_200_OK)
-
 
 
 

@@ -26,7 +26,7 @@ urlpatterns = [
     path('api/questions', give_questions, name='give-questions-api'),
     path('api/add-room/', add_room, name='add-room-api'),
     path('api/update-room-status/', update_room_status, name='update-room-status-api'),
-    path('api/move-to-next-q/<str:room_code>/<str:status>/', can_move_to_next_question, name='move-to-next-q-api'),
+    path('api/move-to-next-q/<str:room_code>/<str:curr_status>/', can_move_to_next_question, name='move-to-next-q-api'),
     path('api/get-rooms/', get_rooms, name='get-rooms-api'),
     path('api/quizzes/', give_quizzes, name='give-quizzes-api'),
 ]

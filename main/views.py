@@ -139,9 +139,7 @@ def add_room(request):
     return Response({"room_id": room.room_id, "room_code": room.room_code, 'message': 'Room created successfully'}, status=status.HTTP_201_CREATED)
 
 @api_view(['GET'])
-def can_move_to_next_question(request):
-    room_code = request.query_params.get('room_code')
-    curr_status = request.query_params.get('status')
+def can_move_to_next_question(request, room_code, curr_status):
     if not room_code or curr_status is None:
         return Response({"error": "Missing room_code or status"}, status=status.HTTP_400_BAD_REQUEST)
     try:

@@ -69,7 +69,7 @@ class GroupResponse(models.Model):
     resp_id = models.AutoField(primary_key=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, db_column='group_id')
     question = models.ForeignKey(Question, on_delete=models.CASCADE, db_column='question_id')
-    answer = models.TextField()
+    submitted_answer = models.TextField()
     is_correct = models.BooleanField(default=False)
     points_earned = models.IntegerField(default=0)
     response_time = models.IntegerField()

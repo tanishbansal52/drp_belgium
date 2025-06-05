@@ -72,7 +72,7 @@ def submit_answer(request):
     GroupResponse.objects.create(
         group=group,
         question=question,
-        answer=answer,
+        submitted_answer=answer,
         is_correct=is_correct,
         points_earned=points_earned,
         response_time=0  # for now
@@ -80,13 +80,13 @@ def submit_answer(request):
 
     # Update score
     if is_correct:
-        group.current_score += points_earned
+        group.curr_score += points_earned
         group.save()
 
     return JsonResponse({
         'correct': is_correct,
         'points_earned': points_earned,
-        'total_score': group.current_score
+        'total_score': group.curr_score
     })
 
 @api_view(['POST'])

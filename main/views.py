@@ -106,8 +106,8 @@ def join_room(request):
     if not created:
         return Response({'error': 'Group already exists for this room'}, status=status.HTTP_400_BAD_REQUEST)
     
-    return Response({"group_id": group.id,
-        "room_code": room.code, 'message': 'Group created successfully'}, status=status.HTTP_201_CREATED)
+    return Response({"group_id": group.group_id,
+        "room_code": room.room_code, 'message': 'Group created successfully'}, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
 def add_room(request):
@@ -120,7 +120,7 @@ def add_room(request):
     if not created:
         return Response({'error': 'Room already exists'}, status=status.HTTP_400_BAD_REQUEST)
     
-    return Response({"room_id": room.id, "room_code": room.room_code, 'message': 'Room created successfully'}, status=status.HTTP_201_CREATED)
+    return Response({"room_id": room.room_id, "room_code": room.room_code, 'message': 'Room created successfully'}, status=status.HTTP_201_CREATED)
 
 
 @api_view(['POST'])
@@ -139,7 +139,7 @@ def update_room_status(request):
     room.curr_number = new_status
 
     room.save()
-    return Response({"room_id": room.id, "room_code": room.room_code, "status": room.curr_number, "message": "Room status updated"}, status=status.HTTP_200_OK)
+    return Response({"room_id": room.room_id, "room_code": room.room_code, "status": room.curr_number, "message": "Room status updated"}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 def get_room_status(request, room_code):

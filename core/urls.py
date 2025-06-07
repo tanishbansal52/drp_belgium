@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views import simple_json_view, submit_answer, join_room, give_questions, add_room, update_room_status, can_move_to_next_question, get_rooms, give_quizzes, get_room_groups
+from main.views import simple_json_view, submit_answer, join_room, give_questions, add_room, update_room_status, can_move_to_next_question, get_rooms, give_quizzes, get_room_groups, update_before_rating, update_after_rating
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,4 +30,6 @@ urlpatterns = [
     path('api/get-rooms/', get_rooms, name='get-rooms-api'),
     path('api/quizzes/', give_quizzes, name='give-quizzes-api'),
     path('api/get-room-groups/<str:room_code>/', get_room_groups, name='get-room-groups-api'),
+    path('api/update-before-rating/', update_before_rating, name='update-before-rating-api'),
+    path('api/update-after-rating/', update_after_rating, name='update-after-rating-api')
 ]

@@ -189,6 +189,40 @@ def get_room_groups(request, room_code):
     group_list = [{"group_id": group.group_id, "name": group.name, "members": list(group.student_names), "curr_score": group.curr_score} for group in groups]
     return Response(group_list, status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+def update_before_rating(request):
+    before_rating = request.data.get('before_rating')
+    group_id = request.data.get('group_id')
+
+    if not before_rating or not group_id:
+        return Response({"error": "Missing before_rating or group_name"}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        group = Group.objects.get(group_id=group_id)
+    except Group.DoesNotExist:
+        return Response({"error": "Group not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    group.before_rating = before_rating
+    group.save()
+    
+    return Response({"group_id": group.group_id, "name": group.name, "before_rating": group.before_rating, "message": "Before rating updated"}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def update_after_rating(request):
+    after_rating = request.data.get('after_rating')
+    group_id = request.data.get('group_id')
+
+    if not after_rating or not group_id:
+        return Response({"error": "Missing after_rating or group_name"}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        group = Group.objects.get(group_id=group_id)
+    except Group.DoesNotExist:
+        return Response({"error": "Group not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    group.after_rating = after_rating
+    group.save()
+
+    return Response({"group_id": group.group_id, "name": group.name, "after_rating": group.after_rating, "message": "After rating updated"}, status=status.HTTP_200_OK)
+
 
 
 

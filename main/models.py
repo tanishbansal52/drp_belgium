@@ -59,6 +59,8 @@ class Group(models.Model):
     name = models.CharField(max_length=100, db_column='group_name')
     curr_score = models.IntegerField(default=0, db_column='curr_score')
     student_names = ArrayField(models.TextField(), blank=True, default=list)
+    before_rating = models.IntegerField(default=0, db_column='before_rating')
+    after_rating = models.IntegerField(default=0, db_column='after_rating')
 
     def __str__(self):
         return self.name

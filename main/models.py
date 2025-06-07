@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
 # Create your models here.
 class UserProfile(models.Model):
@@ -57,6 +58,7 @@ class Group(models.Model):
     room = models.ForeignKey(Room, db_column='room_id', on_delete=models.CASCADE)
     name = models.CharField(max_length=100, db_column='group_name')
     curr_score = models.IntegerField(default=0, db_column='curr_score')
+    student_names = ArrayField(models.TextField(), blank=True, default=list)
 
     def __str__(self):
         return self.name

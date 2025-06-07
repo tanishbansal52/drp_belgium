@@ -109,6 +109,7 @@ def submit_answer(request):
 def join_room(request):
     room_code = request.data.get('room_code')
     group_name = request.data.get('group_name')
+    student_names = request.data.get('student_names', [])
 
     if not room_code or not group_name:
         return Response({"error": "Missing fields"}, status=status.HTTP_400_BAD_REQUEST)
@@ -118,12 +119,14 @@ def join_room(request):
     except Room.DoesNotExist:
         return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
     
-    group, created = Group.objects.get_or_create(name=group_name, room=room)
+    group, created = Group.objects.get_or_create(name=group_name, room=room, student_names=student_names)
     if not created:
         return Response({'error': 'Group already exists for this room'}, status=status.HTTP_400_BAD_REQUEST)
     
     return Response({"group_id": group.group_id,
-        "room_code": room.room_code, 'message': 'Group created successfully'}, status=status.HTTP_201_CREATED)
+        "room_code": room.room_code,
+        "student_names": group.student_names, 
+        'message': 'Group created successfully'}, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
 def add_room(request):
@@ -183,7 +186,7 @@ def get_room_groups(request, room_code):
         return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
     
     groups = Group.objects.filter(room=room)
-    group_list = [{"group_id": group.group_id, "name": group.name, "curr_score": group.curr_score} for group in groups]
+    group_list = [{"group_id": group.group_id, "name": group.name, "members": list(group.student_names), "curr_score": group.curr_score} for group in groups]
     return Response(group_list, status=status.HTTP_200_OK)
 
 

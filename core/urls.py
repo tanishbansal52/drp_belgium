@@ -16,14 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views import simple_json_view, submit_answer, join_room, give_questions, add_room, update_room_status, can_move_to_next_question, get_rooms, give_quizzes, get_room_groups
+from main.views import simple_json_view, submit_answer, join_room, give_questions, add_room, update_room_status, can_move_to_next_question, get_rooms, give_quizzes, get_room_groups, give_questions_geometry, give_questions_alg_basic, give_questions_alg_int
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/questions/<int:n>/', simple_json_view, name='simple-data-api'),
     path('api/submit/', submit_answer),
     path('api/join-room/', join_room),
-    path('api/questions', give_questions, name='give-questions-api'),
+    path('api/questions-data/<int:quiz_id>/', give_questions, name='give-questions-api'),
     path('api/add-room/', add_room, name='add-room-api'),
     path('api/update-room-status/', update_room_status, name='update-room-status-api'),
     path('api/move-to-next-q/<str:room_code>/<str:curr_status>/', can_move_to_next_question, name='move-to-next-q-api'),

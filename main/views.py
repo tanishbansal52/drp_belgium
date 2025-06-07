@@ -36,8 +36,8 @@ def simple_json_view(request, n):
         'quiz': question.quiz.title
     })
 
-def give_questions(request):
-    questions = list(Question.objects.all())
+def give_questions(request, quiz_id):
+    questions = Question.objects.filter(quiz_id=quiz_id)
     if not questions:
         return JsonResponse({'error': 'No questions available'}, status=404)
 
@@ -58,6 +58,7 @@ def give_quizzes(request):
         return JsonResponse({'error': 'No quizzes available'}, status=404)
 
     data = [{
+        'id': q.id,
         'title': q.title,
         'subject': q.subject,
         'difficulty': q.difficulty,

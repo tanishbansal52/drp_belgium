@@ -11,13 +11,6 @@ import json
 from .models import GroupResponse, Group, Question
 
 # Create your views here.
-# def simple_json_view(request):
-    # if not UserProfile.objects.exists():
-    #     UserProfile.objects.create(name="Test User", email="test@example.com")
-
-    # data = list(UserProfile.objects.values('name', 'email'))
-    # quizname = Quiz.objects.first().title if Quiz.objects.exists() else "No quizzes available"
-    # return JsonResponse({'question': '5x = 0. What is x = ?', 'quiz': quizname}, safe=False)
 
 def simple_json_view(request, n):
     if n is None or n < 0:
@@ -203,7 +196,7 @@ def update_before_rating(request):
     
     group.before_rating = before_rating
     group.save()
-    
+
     return Response({"group_id": group.group_id, "name": group.name, "before_rating": group.before_rating, "message": "Before rating updated"}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
@@ -223,8 +216,21 @@ def update_after_rating(request):
 
     return Response({"group_id": group.group_id, "name": group.name, "after_rating": group.after_rating, "message": "After rating updated"}, status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+def mark_mission_complete(request):
+    room_code = request.data.get('room_code')
 
-
+    if not room_code:
+        return Response({"error": "Missing room_code"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        room = Room.objects.get(room_code=room_code)
+    except Room.DoesNotExist:
+        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    room.status = 'completed'
+    room.save()
+    return Response({"room_id": room.room_id, "room_code": room.room_code, "status": room.status, "message": "Mission marked as complete"}, status=status.HTTP_200_OK)
 
 
 

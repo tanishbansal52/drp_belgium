@@ -24,9 +24,10 @@ def simple_json_view(request, n):
         'question_id': question.id,
         'answer': question.answer,
         'question_text': question.question_text,
-        'answer': question.answer,
         'points': question.points,
-        'quiz': question.quiz.title
+        'quiz': question.quiz.title,
+        'quiz_id': question.quiz.id,
+        'q_type': question.q_type
     })
 
 def give_questions(request, quiz_id):
@@ -40,6 +41,7 @@ def give_questions(request, quiz_id):
         'answer': q.answer,
         'points': q.points,
         'quiz': q.quiz.title
+
     } for q in questions]
 
     return JsonResponse(data, safe=False)

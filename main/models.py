@@ -29,6 +29,7 @@ class Question(models.Model):
     question_text = models.TextField()
     answer = models.TextField()
     points = models.IntegerField()
+    q_type = models.TextField()
 
     def __str__(self):
         return self.question_text

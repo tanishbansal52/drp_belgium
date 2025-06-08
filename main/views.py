@@ -51,6 +51,7 @@ def give_quizzes(request):
         return JsonResponse({'error': 'No quizzes available'}, status=404)
 
     data = [{
+        'quiz_id': q.id,
         'title': q.title,
         'subject': q.subject,
         'difficulty': q.difficulty,
@@ -124,11 +125,15 @@ def join_room(request):
 @api_view(['POST'])
 def add_room(request):
     room_code = request.data.get('room_code')
+    quiz_id = request.data.get('quiz_id') 
+
+    if not quiz_id:
+        quiz_id = 1
 
     if not room_code:
         return Response({"error": "Missing room_code"}, status=status.HTTP_400_BAD_REQUEST)
     
-    room, created = Room.objects.get_or_create(room_code=room_code, curr_number=0, quiz=1) 
+    room, created = Room.objects.get_or_create(room_code=room_code, curr_number=0, quiz= Quiz.objects.get(id=quiz_id)) 
     if not created:
         return Response({'error': 'Room already exists'}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -253,7 +258,6 @@ def get_past_missions(request):
             total_groups = Group.objects.filter(room=room).count()
             total_questions = Question.objects.filter(quiz=room.quiz).count()
             
-            print(f"Total questions in quiz {room.quiz.title}: {total_questions}")
             mission_data = {
                 'room_id': room.room_id,
                 'room_code': room.room_code,

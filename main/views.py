@@ -128,7 +128,7 @@ def add_room(request):
     if not room_code:
         return Response({"error": "Missing room_code"}, status=status.HTTP_400_BAD_REQUEST)
     
-    room, created = Room.objects.get_or_create(room_code=room_code, curr_number=0)
+    room, created = Room.objects.get_or_create(room_code=room_code, curr_number=0, quiz=1) 
     if not created:
         return Response({'error': 'Room already exists'}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -233,4 +233,49 @@ def mark_mission_complete(request):
     return Response({"room_id": room.room_id, "room_code": room.room_code, "status": room.status, "message": "Mission marked as complete"}, status=status.HTTP_200_OK)
 
 
-
+@api_view(["GET"])
+def get_past_missions(request):
+    """
+    Get all completed missions (rooms with status 'completed')
+    """
+    try:
+        past_missions = Room.objects.filter(status='completed')
+        
+        if not past_missions:   
+            return JsonResponse({
+                'success': False,
+                'message': 'No past missions found'
+            }, status=404)
+        
+        missions_data = []
+        for room in past_missions:
+            # Get additional stats for each mission
+            total_groups = Group.objects.filter(room=room).count()
+            total_questions = Question.objects.filter(quiz=room.quiz).count()
+            
+            print(f"Total questions in quiz {room.quiz.title}: {total_questions}")
+            mission_data = {
+                'room_id': room.room_id,
+                'room_code': room.room_code,
+                'quiz_title': room.quiz.title,
+                'quiz_subject': room.quiz.subject,
+                'quiz_difficulty': room.quiz.difficulty,
+                'total_time': room.quiz.total_time,
+                'created_at': room.created_at.isoformat(),
+                'total_groups': total_groups,
+                'total_questions': total_questions
+            }
+            # print(f"Mission data for room {room.room_code}: {mission_data}")
+            missions_data.append(mission_data)
+        
+        return JsonResponse({
+            'success': True,
+            'missions': missions_data,
+            'total_count': len(missions_data)
+        })
+    
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)

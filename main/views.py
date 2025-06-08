@@ -11,11 +11,19 @@ import json
 from .models import GroupResponse, Group, Question
 
 # Create your views here.
+@api_view(['GET'])
+def get_quiz_id_by_room_code(request, room_code):
+    try:
+        room = Room.objects.get(room_code=room_code)
+    except Room.DoesNotExist:
+        return Response({'error': 'Room not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    return Response({'quiz_id': room.quiz.id}, status=status.HTTP_200_OK)
 
-def simple_json_view(request, n):
+def simple_json_view(request, n, quiz_id):
     if n is None or n < 0:
         n = 0
-    questions = list(Question.objects.all())  # later use current question from room
+    questions = list(Question.objects.filter(quiz_id=quiz_id))  # later use current question from room
     question = questions[n] if questions else None
     if not question:
         return JsonResponse({'error': 'No question available'}, status=404)

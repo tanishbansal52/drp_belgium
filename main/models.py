@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
 
 # Create your models here.
 class UserProfile(models.Model):
@@ -40,7 +41,7 @@ class Room(models.Model):
     room_id = models.AutoField(primary_key=True)
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, db_column='quiz_id')
     room_code = models.TextField(unique=True)
-    status = models.CharField(max_length=20, choices=[('waiting', 'Waiting'), ('active', 'Active'), ('finished', 'Finished')], default='waiting')
+    status = models.CharField(max_length=20, default='waiting')
     current_question = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True, db_column='current_question_id')
     created_at = models.DateTimeField(auto_now_add=True)
     curr_number = models.IntegerField(default=0, db_column='curr_number')
@@ -57,6 +58,9 @@ class Group(models.Model):
     room = models.ForeignKey(Room, db_column='room_id', on_delete=models.CASCADE)
     name = models.CharField(max_length=100, db_column='group_name')
     curr_score = models.IntegerField(default=0, db_column='curr_score')
+    student_names = ArrayField(models.TextField(), blank=True, default=list)
+    before_rating = models.IntegerField(default=0, db_column='before_rating')
+    after_rating = models.IntegerField(default=0, db_column='after_rating')
 
     def __str__(self):
         return self.name

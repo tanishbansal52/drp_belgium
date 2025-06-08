@@ -11,13 +11,6 @@ import json
 from .models import GroupResponse, Group, Question
 
 # Create your views here.
-# def simple_json_view(request):
-    # if not UserProfile.objects.exists():
-    #     UserProfile.objects.create(name="Test User", email="test@example.com")
-
-    # data = list(UserProfile.objects.values('name', 'email'))
-    # quizname = Quiz.objects.first().title if Quiz.objects.exists() else "No quizzes available"
-    # return JsonResponse({'question': '5x = 0. What is x = ?', 'quiz': quizname}, safe=False)
 
 def simple_json_view(request, n):
     if n is None or n < 0:
@@ -58,7 +51,7 @@ def give_quizzes(request):
         return JsonResponse({'error': 'No quizzes available'}, status=404)
 
     data = [{
-        'id': q.id,
+        'quiz_id': q.id,
         'title': q.title,
         'subject': q.subject,
         'difficulty': q.difficulty,
@@ -110,6 +103,7 @@ def submit_answer(request):
 def join_room(request):
     room_code = request.data.get('room_code')
     group_name = request.data.get('group_name')
+    student_names = request.data.get('student_names', [])
 
     if not room_code or not group_name:
         return Response({"error": "Missing fields"}, status=status.HTTP_400_BAD_REQUEST)
@@ -119,21 +113,27 @@ def join_room(request):
     except Room.DoesNotExist:
         return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
     
-    group, created = Group.objects.get_or_create(name=group_name, room=room)
+    group, created = Group.objects.get_or_create(name=group_name, room=room, student_names=student_names)
     if not created:
         return Response({'error': 'Group already exists for this room'}, status=status.HTTP_400_BAD_REQUEST)
     
     return Response({"group_id": group.group_id,
-        "room_code": room.room_code, 'message': 'Group created successfully'}, status=status.HTTP_201_CREATED)
+        "room_code": room.room_code,
+        "student_names": group.student_names, 
+        'message': 'Group created successfully'}, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
 def add_room(request):
     room_code = request.data.get('room_code')
+    quiz_id = request.data.get('quiz_id') 
+
+    if not quiz_id:
+        quiz_id = 1
 
     if not room_code:
         return Response({"error": "Missing room_code"}, status=status.HTTP_400_BAD_REQUEST)
     
-    room, created = Room.objects.get_or_create(room_code=room_code, curr_number=0)
+    room, created = Room.objects.get_or_create(room_code=room_code, curr_number=0, quiz= Quiz.objects.get(id=quiz_id)) 
     if not created:
         return Response({'error': 'Room already exists'}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -184,11 +184,102 @@ def get_room_groups(request, room_code):
         return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
     
     groups = Group.objects.filter(room=room)
-    group_list = [{"group_id": group.group_id, "name": group.name, "curr_score": group.curr_score} for group in groups]
+    group_list = [{"group_id": group.group_id, "name": group.name, "members": list(group.student_names), "curr_score": group.curr_score} for group in groups]
     return Response(group_list, status=status.HTTP_200_OK)
 
+@api_view(['POST'])
+def update_before_rating(request):
+    before_rating = request.data.get('before_rating')
+    group_id = request.data.get('group_id')
+
+    if not before_rating or not group_id:
+        return Response({"error": "Missing before_rating or group_name"}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        group = Group.objects.get(group_id=group_id)
+    except Group.DoesNotExist:
+        return Response({"error": "Group not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    group.before_rating = before_rating
+    group.save()
+
+    return Response({"group_id": group.group_id, "name": group.name, "before_rating": group.before_rating, "message": "Before rating updated"}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def update_after_rating(request):
+    after_rating = request.data.get('after_rating')
+    group_id = request.data.get('group_id')
+
+    if not after_rating or not group_id:
+        return Response({"error": "Missing after_rating or group_name"}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        group = Group.objects.get(group_id=group_id)
+    except Group.DoesNotExist:
+        return Response({"error": "Group not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    group.after_rating = after_rating
+    group.save()
+
+    return Response({"group_id": group.group_id, "name": group.name, "after_rating": group.after_rating, "message": "After rating updated"}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+def mark_mission_complete(request):
+    room_code = request.data.get('room_code')
+
+    if not room_code:
+        return Response({"error": "Missing room_code"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        room = Room.objects.get(room_code=room_code)
+    except Room.DoesNotExist:
+        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    room.status = 'completed'
+    room.save()
+    return Response({"room_id": room.room_id, "room_code": room.room_code, "status": room.status, "message": "Mission marked as complete"}, status=status.HTTP_200_OK)
 
 
-
-
-
+@api_view(["GET"])
+def get_past_missions(request):
+    """
+    Get all completed missions (rooms with status 'completed')
+    """
+    try:
+        past_missions = Room.objects.filter(status='completed')
+        
+        if not past_missions:   
+            return JsonResponse({
+                'success': False,
+                'message': 'No past missions found'
+            }, status=404)
+        
+        missions_data = []
+        for room in past_missions:
+            # Get additional stats for each mission
+            total_groups = Group.objects.filter(room=room).count()
+            total_questions = Question.objects.filter(quiz=room.quiz).count()
+            
+            mission_data = {
+                'room_id': room.room_id,
+                'room_code': room.room_code,
+                'quiz_title': room.quiz.title,
+                'quiz_subject': room.quiz.subject,
+                'quiz_difficulty': room.quiz.difficulty,
+                'total_time': room.quiz.total_time,
+                'created_at': room.created_at.isoformat(),
+                'total_groups': total_groups,
+                'total_questions': total_questions
+            }
+            # print(f"Mission data for room {room.room_code}: {mission_data}")
+            missions_data.append(mission_data)
+        
+        return JsonResponse({
+            'success': True,
+            'missions': missions_data,
+            'total_count': len(missions_data)
+        })
+    
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)

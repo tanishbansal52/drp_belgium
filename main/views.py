@@ -23,10 +23,11 @@ def get_quiz_id_by_room_code(request, room_code):
 def simple_json_view(request, n, quiz_id):
     if n is None or n < 0:
         n = 0
-    questions = list(Question.objects.filter(quiz_id=quiz_id))  # later use current question from room
-    question = questions[n] if questions else None
-    if not question:
+    # Always order questions to ensure consistent indexing
+    questions = list(Question.objects.filter(quiz_id=quiz_id).order_by('id'))
+    if n >= len(questions):
         return JsonResponse({'error': 'No question available'}, status=404)
+    question = questions[n]
 
     return JsonResponse({
         'question_id': question.id,
@@ -35,6 +36,25 @@ def simple_json_view(request, n, quiz_id):
         'points': question.points,
         'quiz': question.quiz.title,
         'quiz_id': question.quiz.id,
+        'q_type': question.q_type
+    })
+
+@api_view(['GET'])
+def give_question_type(request, n, quiz_id):
+    if n is None or n < 0:
+        n = 0
+    questions = list(Question.objects.filter(quiz_id=quiz_id))  # later use current question from room
+    question = questions[n] if questions else None
+    if not question:
+        return JsonResponse({'error': 'No question available'}, status=404)
+
+    return JsonResponse({
+        # 'question_id': question.id,
+        # 'answer': question.answer,
+        # 'question_text': question.question_text,
+        # 'points': question.points,
+        # 'quiz': question.quiz.title,
+        # 'quiz_id': question.quiz.id,
         'q_type': question.q_type
     })
 

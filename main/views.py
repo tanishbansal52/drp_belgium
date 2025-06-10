@@ -468,6 +468,7 @@ def get_mission_leaderboard(request, room_id):
                 'score': group.curr_score,
                 'accuracy': round(accuracy, 2),
                 'student_count': len(group.student_names),
+                'student_names': list(group.student_names),
                 'rating_improvement': group.after_rating - group.before_rating
             })
         

@@ -117,6 +117,78 @@ def submit_answer(request):
         'total_score': group.curr_score
     })
 
+@api_view(['GET'])
+def get_groups_finished_question(request, room_code, question_id):
+    """
+    API to get all groups that have finished a particular question in a room.
+    
+    Expected parameters:
+    - room_code: The room code
+    - question_id: The ID of the question
+    
+    Returns:
+    - List of groups with their names and student names who have submitted answers
+    """
+    
+    if not room_code or not question_id:
+        return JsonResponse({
+            'error': 'Both room_code and question_id are required'
+        }, status=400)
+    
+    try:
+        # Get the room
+        room = Room.objects.get(room_code=room_code)
+        
+        # Get the question
+        question = Question.objects.get(id=question_id)
+        
+        # Verify the question belongs to the room's quiz
+        if question.quiz != room.quiz:
+            return JsonResponse({
+                'error': 'Question does not belong to this room\'s quiz'
+            }, status=400)
+        
+        # Get all groups in this room that have submitted responses to this question
+        groups_with_responses = Group.objects.filter(
+            room=room,
+            groupresponse__question=question
+        ).distinct()
+        
+        # Format the response data
+        finished_groups = []
+        for group in groups_with_responses:
+            # Get the response for additional info
+            response = GroupResponse.objects.get(group=group, question=question)
+            
+            finished_groups.append({
+                'group_id': group.group_id,
+                'group_name': group.name,
+                'student_names': group.student_names,
+                'is_correct': response.is_correct,
+                'points_earned': response.points_earned,
+                'submitted_answer': response.submitted_answer,
+                'current_score': group.curr_score
+            })
+        
+        # Get total number of groups in the room for context
+        total_groups = Group.objects.filter(room=room).count()
+        
+        return JsonResponse({
+            'room_code': room_code,
+            'question_id': question_id,
+            'question_text': question.question_text,
+            'finished_groups': finished_groups,
+            'total_groups': total_groups,
+            'finished_count': len(finished_groups)
+        }, status=200)
+        
+    except Room.DoesNotExist:
+        return JsonResponse({'error': 'Room not found'}, status=404)
+    except Question.DoesNotExist:
+        return JsonResponse({'error': 'Question not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
 
 @api_view(['POST'])
 def join_room(request):
@@ -403,6 +475,8 @@ def get_mission_report(request, room_id):
                 group_data['question_responses'].append(response_data)
             
             report_data['group_performance'].append(group_data)
+
+        print("after group performance calc")
         
         # Question-wise analysis
         for question in questions:
@@ -428,6 +502,8 @@ def get_mission_report(request, room_id):
             }
             
             report_data['question_analysis'].append(question_data)
+
+            print("after question analysis calc")
         
         return JsonResponse({
             'success': True,

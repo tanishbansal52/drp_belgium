@@ -424,7 +424,7 @@ def get_mission_report(request, room_id):
                 'accuracy_percentage': round(accuracy, 2),
                 'average_response_time': round(avg_response_time, 2),
                 'average_points_earned': round(avg_points, 2),
-                'difficulty_rating': 'Easy' if accuracy > 80 else 'Medium' if accuracy > 50 else 'Hard'
+                'difficulty_rating': 'Easy' if accuracy > 80 else 'Medium' if accuracy >= 50 else 'Hard'
             }
             
             report_data['question_analysis'].append(question_data)

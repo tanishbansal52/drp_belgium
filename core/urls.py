@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views import simple_json_view, submit_answer, join_room, give_questions, add_room, update_room_status, can_move_to_next_question, get_rooms, give_quizzes, get_room_groups, update_before_rating, update_after_rating, mark_mission_complete, get_past_missions
+from main.views import simple_json_view, submit_answer, join_room, give_questions, add_room, update_room_status, can_move_to_next_question, get_rooms, give_quizzes, get_room_groups, update_before_rating, update_after_rating, mark_mission_complete, get_past_missions, get_mission_report, get_mission_leaderboard
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -33,5 +33,7 @@ urlpatterns = [
     path('api/update-before-rating/', update_before_rating, name='update-before-rating-api'),
     path('api/update-after-rating/', update_after_rating, name='update-after-rating-api'),
     path('api/mark-mission-complete/', mark_mission_complete, name='mark-mission-complete-api'),
-    path('api/past-missions/', get_past_missions, name='get_past_missions')
+    path('api/past-missions/', get_past_missions, name='get_past_missions'),
+    path('api/mission-report/<int:room_id>/', get_mission_report, name='get-mission-report-api'),
+    path('api/mission-leaderboard/<int:room_id>/', get_mission_leaderboard, name='get-mission-leaderboard-api')
 ]

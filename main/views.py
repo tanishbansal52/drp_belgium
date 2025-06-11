@@ -336,6 +336,7 @@ def get_past_missions(request):
                 'room_id': room.room_id,
                 'room_code': room.room_code,
                 'quiz_title': room.quiz.title,
+                'quiz_id': room.quiz.id,
                 'quiz_subject': room.quiz.subject,
                 'quiz_difficulty': room.quiz.difficulty,
                 'total_time': room.quiz.total_time,

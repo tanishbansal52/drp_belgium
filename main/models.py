@@ -11,6 +11,7 @@ class UserProfile(models.Model):
         return self.name
 
 class Quiz(models.Model):
+    id = models.AutoField(primary_key=True)
     title = models.TextField()
     subject = models.TextField()
     difficulty = models.TextField()

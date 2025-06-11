@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views import simple_json_view, submit_answer, join_room, give_questions, add_room, update_room_status, can_move_to_next_question, get_rooms, give_quizzes, get_room_groups, update_before_rating, update_after_rating, mark_mission_complete, get_past_missions, get_quiz_id_by_room_code, give_question_type, toggle_spinoff, get_room_spinoff
+from main.views import simple_json_view, submit_answer, join_room, give_questions, add_room, update_room_status, can_move_to_next_question, get_rooms, give_quizzes, get_room_groups, update_before_rating, update_after_rating, mark_mission_complete, get_past_missions, get_quiz_id_by_room_code, give_question_type, toggle_spinoff, get_room_spinoff, get_bonus_question
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -26,6 +26,7 @@ urlpatterns = [
     path('api/submit/', submit_answer),
     path('api/join-room/', join_room),
     path('api/questions-data/<int:quiz_id>/', give_questions, name='give-questions-api'),
+    path('api/bonus-question/<int:quiz_id>/', get_bonus_question, name='give-bonus-api'),
     path('api/add-room/', add_room, name='add-room-api'),
     path('api/update-room-status/', update_room_status, name='update-room-status-api'),
     path('api/move-to-next-q/<str:room_code>/<str:curr_status>/', can_move_to_next_question, name='move-to-next-q-api'),

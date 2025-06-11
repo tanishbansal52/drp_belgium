@@ -74,6 +74,21 @@ def give_questions(request, quiz_id):
 
     return JsonResponse(data, safe=False)
 
+def get_bonus_question(request, quiz_id):
+    questions = list(Question.objects.filter(quiz_id=quiz_id).order_by('id'))
+    if len(questions) < 4:
+        return JsonResponse({'error': 'No bonus question available'}, status=404)
+    question = questions[3]  # 4th question (0-based index)
+    data = {
+        'question_id': question.id,
+        'question_text': question.question_text,
+        'answer': question.answer,
+        'points': question.points,
+        'quiz': question.quiz.title,
+        'q_type': question.q_type
+    }
+    return JsonResponse(data)
+
 @api_view(['GET'])
 def give_quizzes(request):
     quizzes = list(Quiz.objects.all())

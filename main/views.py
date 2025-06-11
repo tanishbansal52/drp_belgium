@@ -313,3 +313,22 @@ def get_past_missions(request):
             'success': False,
             'error': str(e)
         }, status=500)
+
+@api_view(['POST'])
+def toggle_spinoff(request, room_code):
+    room = Room.objects.get(room_code=room_code)
+    if not room:
+        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+    room.spinoff_mode = request.data.get("spinoff_mode", False)
+    room.save()
+    print(room.spinoff_mode)
+    return Response({"status": "updated", "spinoff_mode": room.spinoff_mode}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_room_spinoff(request, room_code):
+    try:
+        room = Room.objects.get(room_code=room_code)
+    except Room.DoesNotExist:
+        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    return Response({"spinoff_mode": room.spinoff_mode}, status=status.HTTP_200_OK)

@@ -46,6 +46,7 @@ class Room(models.Model):
     current_question = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True, db_column='current_question_id')
     created_at = models.DateTimeField(auto_now_add=True)
     curr_number = models.IntegerField(default=0, db_column='curr_number')
+    spinoff_mode = models.BooleanField(default=False)
 
     def __str__(self):
         return self.room_code

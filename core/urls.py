@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from main.views import simple_json_view, submit_answer, join_room, give_questions, add_room, update_room_status, can_move_to_next_question, get_rooms, give_quizzes, get_room_groups, update_before_rating, update_after_rating, mark_mission_complete, get_past_missions, get_quiz_id_by_room_code, give_question_type, toggle_spinoff, get_room_spinoff, get_bonus_question
+from main.views import simple_json_view, submit_answer, join_room, give_questions, add_room, update_room_status, can_move_to_next_question, get_rooms, give_quizzes, get_room_groups, update_before_rating, update_after_rating, mark_mission_complete, get_past_missions, get_quiz_id_by_room_code, give_question_type, toggle_spinoff, get_room_spinoff, get_bonus_question, give_favourite_quizzes, toggle_quiz_favourite
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -39,4 +39,6 @@ urlpatterns = [
     path('api/past-missions/', get_past_missions, name='get_past_missions'),
     path('api/toggle-spinoff/<str:room_code>/', toggle_spinoff, name='toggle-spinoff-api'),
     path('api/get-room-spinoff/<str:room_code>/', get_room_spinoff, name='get-room-spinoff-api'),
+    path('api/favourite-quizzes/', give_favourite_quizzes, name='give-favourite-quizzes-api'),
+    path('api/toggle-quiz-favourite/', toggle_quiz_favourite, name='toggle-quiz-favourite-api'),
 ]

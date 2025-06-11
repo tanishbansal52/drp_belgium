@@ -106,6 +106,35 @@ def give_quizzes(request):
 
     return JsonResponse(data, safe=False)
 
+@api_view(['GET'])
+def give_favourite_quizzes(request):
+    quizzes = list(Quiz.objects.all().filter(is_favourite=True))
+
+    data = [{
+        'quiz_id': q.id,
+        'title': q.title,
+        'subject': q.subject,
+        'difficulty': q.difficulty,
+        'total_time': q.total_time,
+        'description': q.description
+    } for q in quizzes]
+
+    return JsonResponse(data, safe=False)
+
+@api_view(['POST'])
+def toggle_quiz_favourite(request):
+    quiz_id = request.data.get('quiz_id')
+    if not quiz_id:
+        return Response({"error": "Missing quiz_id"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        quiz = Quiz.objects.get(id=quiz_id)
+        quiz.is_favourite = not quiz.is_favourite  # Toggle favourite status
+        quiz.save()
+        return Response({"message": "Quiz favourite status updated", "is_favourite": quiz.is_favourite}, status=status.HTTP_200_OK)
+    except Quiz.DoesNotExist:
+        return Response({"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND)
+
 @csrf_exempt
 @require_POST
 def submit_answer(request):

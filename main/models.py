@@ -16,6 +16,7 @@ class Quiz(models.Model):
     difficulty = models.TextField()
     total_time = models.IntegerField()
     description = models.TextField()
+    is_favourite = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title

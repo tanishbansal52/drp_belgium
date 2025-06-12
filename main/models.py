@@ -11,11 +11,13 @@ class UserProfile(models.Model):
         return self.name
 
 class Quiz(models.Model):
+    id = models.AutoField(primary_key=True)
     title = models.TextField()
     subject = models.TextField()
     difficulty = models.TextField()
     total_time = models.IntegerField()
     description = models.TextField()
+    is_favourite = models.BooleanField(default=False)
 
     def __str__(self):
         return self.title
@@ -29,6 +31,7 @@ class Question(models.Model):
     question_text = models.TextField()
     answer = models.TextField()
     points = models.IntegerField()
+    q_type = models.TextField()
 
     def __str__(self):
         return self.question_text
@@ -45,6 +48,7 @@ class Room(models.Model):
     current_question = models.ForeignKey(Question, on_delete=models.SET_NULL, null=True, db_column='current_question_id')
     created_at = models.DateTimeField(auto_now_add=True)
     curr_number = models.IntegerField(default=0, db_column='curr_number')
+    spinoff_mode = models.BooleanField(default=False)
 
     def __str__(self):
         return self.room_code

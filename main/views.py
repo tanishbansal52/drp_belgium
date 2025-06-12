@@ -12,26 +12,55 @@ from .models import GroupResponse, Group, Question
 from django.db.models import Avg
 
 # Create your views here.
+@api_view(['GET'])
+def get_quiz_id_by_room_code(request, room_code):
+    try:
+        room = Room.objects.get(room_code=room_code)
+    except Room.DoesNotExist:
+        return Response({'error': 'Room not found'}, status=status.HTTP_404_NOT_FOUND)
+    
+    return Response({'quiz_id': room.quiz.id}, status=status.HTTP_200_OK)
 
-def simple_json_view(request, n):
+def simple_json_view(request, n, quiz_id):
     if n is None or n < 0:
         n = 0
-    questions = list(Question.objects.all())  # later use current question from room
-    question = questions[n] if questions else None
-    if not question:
+    # Always order questions to ensure consistent indexing
+    questions = list(Question.objects.filter(quiz_id=quiz_id).order_by('id'))
+    if n >= len(questions):
         return JsonResponse({'error': 'No question available'}, status=404)
+    question = questions[n]
 
     return JsonResponse({
         'question_id': question.id,
         'answer': question.answer,
         'question_text': question.question_text,
-        'answer': question.answer,
         'points': question.points,
-        'quiz': question.quiz.title
+        'quiz': question.quiz.title,
+        'quiz_id': question.quiz.id,
+        'q_type': question.q_type
     })
 
-def give_questions(request):
-    questions = list(Question.objects.all())
+@api_view(['GET'])
+def give_question_type(request, n, quiz_id):
+    if n is None or n < 0:
+        n = 0
+    questions = list(Question.objects.filter(quiz_id=quiz_id))  # later use current question from room
+    question = questions[n] if questions else None
+    if not question:
+        return JsonResponse({'error': 'No question available'}, status=404)
+
+    return JsonResponse({
+        # 'question_id': question.id,
+        # 'answer': question.answer,
+        # 'question_text': question.question_text,
+        # 'points': question.points,
+        # 'quiz': question.quiz.title,
+        # 'quiz_id': question.quiz.id,
+        'q_type': question.q_type
+    })
+
+def give_questions(request, quiz_id):
+    questions = Question.objects.filter(quiz_id=quiz_id)
     if not questions:
         return JsonResponse({'error': 'No questions available'}, status=404)
 
@@ -41,13 +70,29 @@ def give_questions(request):
         'answer': q.answer,
         'points': q.points,
         'quiz': q.quiz.title
+
     } for q in questions]
 
     return JsonResponse(data, safe=False)
 
+def get_bonus_question(request, quiz_id):
+    questions = list(Question.objects.filter(quiz_id=quiz_id).order_by('id'))
+    if len(questions) < 4:
+        return JsonResponse({'error': 'No bonus question available'}, status=404)
+    question = questions[3]  # 4th question (0-based index)
+    data = {
+        'question_id': question.id,
+        'question_text': question.question_text,
+        'answer': question.answer,
+        'points': question.points,
+        'quiz': question.quiz.title,
+        'q_type': question.q_type
+    }
+    return JsonResponse(data)
+
 @api_view(['GET'])
 def give_quizzes(request):
-    quizzes = list(Quiz.objects.all())
+    quizzes = list(Quiz.objects.all().order_by('id'))
     if not quizzes:
         return JsonResponse({'error': 'No quizzes available'}, status=404)
 
@@ -61,6 +106,35 @@ def give_quizzes(request):
     } for q in quizzes]
 
     return JsonResponse(data, safe=False)
+
+@api_view(['GET'])
+def give_favourite_quizzes(request):
+    quizzes = list(Quiz.objects.all().filter(is_favourite=True))
+
+    data = [{
+        'quiz_id': q.id,
+        'title': q.title,
+        'subject': q.subject,
+        'difficulty': q.difficulty,
+        'total_time': q.total_time,
+        'description': q.description
+    } for q in quizzes]
+
+    return JsonResponse(data, safe=False)
+
+@api_view(['POST'])
+def toggle_quiz_favourite(request):
+    quiz_id = request.data.get('quiz_id')
+    if not quiz_id:
+        return Response({"error": "Missing quiz_id"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        quiz = Quiz.objects.get(id=quiz_id)
+        quiz.is_favourite = not quiz.is_favourite  # Toggle favourite status
+        quiz.save()
+        return Response({"message": "Quiz favourite status updated", "is_favourite": quiz.is_favourite}, status=status.HTTP_200_OK)
+    except Quiz.DoesNotExist:
+        return Response({"error": "Quiz not found"}, status=status.HTTP_404_NOT_FOUND)
 
 @csrf_exempt
 @require_POST
@@ -353,6 +427,7 @@ def get_past_missions(request):
                 'room_id': room.room_id,
                 'room_code': room.room_code,
                 'quiz_title': room.quiz.title,
+                'quiz_id': room.quiz.id,
                 'quiz_subject': room.quiz.subject,
                 'quiz_difficulty': room.quiz.difficulty,
                 'total_time': room.quiz.total_time,
@@ -568,3 +643,22 @@ def get_mission_leaderboard(request, room_id):
             'success': False,
             'error': str(e)
         }, status=500)
+
+@api_view(['POST'])
+def toggle_spinoff(request, room_code):
+    room = Room.objects.get(room_code=room_code)
+    if not room:
+        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+    room.spinoff_mode = request.data.get("spinoff_mode", False)
+    room.save()
+    print(room.spinoff_mode)
+    return Response({"status": "updated", "spinoff_mode": room.spinoff_mode}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_room_spinoff(request, room_code):
+    try:
+        room = Room.objects.get(room_code=room_code)
+    except Room.DoesNotExist:
+        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    return Response({"spinoff_mode": room.spinoff_mode}, status=status.HTTP_200_OK)

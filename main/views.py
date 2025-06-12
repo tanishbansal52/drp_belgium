@@ -9,6 +9,7 @@ from rest_framework import status
 from .models import Room, Group
 import json
 from .models import GroupResponse, Group, Question
+from django.db.models import Avg
 
 # Create your views here.
 @api_view(['GET'])
@@ -152,26 +153,116 @@ def submit_answer(request):
     is_correct = answer.strip() == question.answer.strip()
     points_earned = question.points if is_correct else 0
 
-    # Save the response
-    GroupResponse.objects.create(
-        group=group,
-        question=question,
-        submitted_answer=answer,
-        is_correct=is_correct,
-        points_earned=points_earned,
-        response_time=0  # for now
-    )
+    # Check if a response already exists for this group and question
+    existing_response = GroupResponse.objects.filter(group=group, question=question).first()
 
-    # Update score
-    if is_correct:
-        group.curr_score += points_earned
-        group.save()
+    print("existing response: ", existing_response)
+
+    if existing_response:
+        # If updating to a correct answer and wasn't correct before, update score
+        if is_correct and not existing_response.is_correct:
+            group.curr_score += points_earned
+            group.save()
+
+        # Overwrite existing response
+        existing_response.submitted_answer = answer
+        existing_response.is_correct = is_correct
+        existing_response.points_earned = points_earned
+        existing_response.response_time = 0
+        existing_response.save()
+    else:
+        # New response
+        GroupResponse.objects.create(
+            group=group,
+            question=question,
+            submitted_answer=answer,
+            is_correct=is_correct,
+            points_earned=points_earned,
+            response_time=0  # Placeholder for now
+        )
+
+        if is_correct:
+            group.curr_score += points_earned
+            group.save()
 
     return JsonResponse({
         'correct': is_correct,
         'points_earned': points_earned,
         'total_score': group.curr_score
     })
+
+@api_view(['GET'])
+def get_groups_finished_question(request, room_code, question_id):
+    """
+    API to get all groups that have finished a particular question in a room.
+    
+    Expected parameters:
+    - room_code: The room code
+    - question_id: The ID of the question
+    
+    Returns:
+    - List of groups with their names and student names who have submitted answers
+    """
+    
+    if not room_code or not question_id:
+        return JsonResponse({
+            'error': 'Both room_code and question_id are required'
+        }, status=400)
+    
+    try:
+        # Get the room
+        room = Room.objects.get(room_code=room_code)
+        
+        # Get the question
+        question = Question.objects.get(id=question_id)
+        
+        # Verify the question belongs to the room's quiz
+        if question.quiz != room.quiz:
+            return JsonResponse({
+                'error': 'Question does not belong to this room\'s quiz'
+            }, status=400)
+        
+        # Get all groups in this room that have submitted responses to this question
+        groups_with_responses = Group.objects.filter(
+            room=room,
+            groupresponse__question=question
+        ).distinct()
+        
+        # Format the response data
+        finished_groups = []
+        for group in groups_with_responses:
+            # Get the response for additional info
+            response = GroupResponse.objects.get(group=group, question=question)
+            
+            finished_groups.append({
+                'group_id': group.group_id,
+                'group_name': group.name,
+                'student_names': group.student_names,
+                'is_correct': response.is_correct,
+                'points_earned': response.points_earned,
+                'submitted_answer': response.submitted_answer,
+                'current_score': group.curr_score
+            })
+        
+        # Get total number of groups in the room for context
+        total_groups = Group.objects.filter(room=room).count()
+        
+        return JsonResponse({
+            'room_code': room_code,
+            'question_id': question_id,
+            'question_text': question.question_text,
+            'finished_groups': finished_groups,
+            'total_groups': total_groups,
+            'finished_count': len(finished_groups)
+        }, status=200)
+        
+    except Room.DoesNotExist:
+        return JsonResponse({'error': 'Room not found'}, status=404)
+    except Question.DoesNotExist:
+        return JsonResponse({'error': 'Question not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
 
 @api_view(['POST'])
 def join_room(request):
@@ -359,6 +450,7 @@ def get_past_missions(request):
             'error': str(e)
         }, status=500)
 
+
 @api_view(['POST'])
 def toggle_spinoff(request, room_code):
     room = Room.objects.get(room_code=room_code)
@@ -377,3 +469,199 @@ def get_room_spinoff(request, room_code):
         return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
     
     return Response({"spinoff_mode": room.spinoff_mode}, status=status.HTTP_200_OK)
+
+    
+
+@api_view(["GET"])
+def get_mission_report(request, room_id):
+
+    try:
+        # Get the room and verify it's completed
+        room = Room.objects.get(room_id=room_id, status='completed')
+
+        if not room:
+            return JsonResponse({
+                'success': False,
+                'error': 'Mission not found or not completed'
+            }, status=404)
+        
+        # Get all groups that participated in this room
+        groups = Group.objects.filter(room=room).prefetch_related('groupresponse_set')
+        
+        # Get all questions for this quiz
+        questions = Question.objects.filter(quiz=room.quiz)
+        
+        # Prepare report data
+        report_data = {
+            'room_info': {
+                'room_id': room.room_id,
+                'room_code': room.room_code,
+                'quiz_title': room.quiz.title,
+                'quiz_subject': room.quiz.subject,
+                'quiz_difficulty': room.quiz.difficulty,
+                'total_time': room.quiz.total_time,
+                'created_at': room.created_at.isoformat(),
+                'description': room.quiz.description
+            },
+            'summary_stats': {},
+            'group_performance': [],
+            'question_analysis': []
+        }
+
+        print("after report data setup")
+        
+        # Calculate summary statistics
+        total_groups = groups.count()
+        if total_groups > 0:
+            avg_score = groups.aggregate(avg_score=Avg('curr_score'))['avg_score'] or 0
+            avg_before_rating = groups.aggregate(avg_before=Avg('before_rating'))['avg_before'] or 0
+            avg_after_rating = groups.aggregate(avg_after=Avg('after_rating'))['avg_after'] or 0
+            
+            report_data['summary_stats'] = {
+                'total_groups': total_groups,
+                'average_score': round(avg_score, 2),
+                'average_before_rating': round(avg_before_rating, 2),
+                'average_after_rating': round(avg_after_rating, 2),
+                'rating_improvement': round(avg_after_rating - avg_before_rating, 2)
+            }
+
+        print("after summary stats calc")
+        
+        # Group performance details
+        for group in groups:
+            responses = GroupResponse.objects.filter(group=group).select_related('question')
+
+            print("after first line...responses")
+            
+            # Calculate group-specific stats
+            total_responses = responses.count()
+            correct_responses = responses.filter(is_correct=True).count()
+            accuracy = (correct_responses / total_responses * 100) if total_responses > 0 else 0
+            avg_response_time = responses.aggregate(avg_time=Avg('response_time'))['avg_time'] or 0
+            
+            group_data = {
+                'group_id': group.group_id,
+                'group_name': group.name,
+                'student_names': group.student_names,
+                'total_score': group.curr_score,
+                'before_rating': group.before_rating,
+                'after_rating': group.after_rating,
+                'rating_change': group.after_rating - group.before_rating,
+                'accuracy_percentage': round(accuracy, 2),
+                'total_responses': total_responses,
+                'correct_responses': correct_responses,
+                'average_response_time': round(avg_response_time, 2),
+                'question_responses': []
+            }
+
+            print("after group specific stats calc")
+            
+            # Individual question responses for this group
+            for response in responses:
+                response_data = {
+                    'question_id': response.question.id,
+                    'question_text': response.question.question_text[:100] + '...' if len(response.question.question_text) > 100 else response.question.question_text,
+                    'submitted_answer': response.submitted_answer,
+                    'correct_answer': response.question.answer,
+                    'is_correct': response.is_correct,
+                    'points_earned': response.points_earned,
+                    'max_points': response.question.points,
+                    'response_time': response.response_time
+                }
+                group_data['question_responses'].append(response_data)
+            
+            report_data['group_performance'].append(group_data)
+
+        print("after group performance calc")
+        
+        # Question-wise analysis
+        for question in questions:
+            responses = GroupResponse.objects.filter(question=question, group__room=room)
+            
+            total_attempts = responses.count()
+            correct_attempts = responses.filter(is_correct=True).count()
+            accuracy = (correct_attempts / total_attempts * 100) if total_attempts > 0 else 0
+            avg_response_time = responses.aggregate(avg_time=Avg('response_time'))['avg_time'] or 0
+            avg_points = responses.aggregate(avg_points=Avg('points_earned'))['avg_points'] or 0
+            
+            question_data = {
+                'question_id': question.id,
+                'question_text': question.question_text,
+                'correct_answer': question.answer,
+                'max_points': question.points,
+                'total_attempts': total_attempts,
+                'correct_attempts': correct_attempts,
+                'accuracy_percentage': round(accuracy, 2),
+                'average_response_time': round(avg_response_time, 2),
+                'average_points_earned': round(avg_points, 2),
+                'difficulty_rating': 'Easy' if accuracy > 80 else 'Medium' if accuracy >= 50 else 'Hard'
+            }
+            
+            report_data['question_analysis'].append(question_data)
+
+            print("after question analysis calc")
+        
+        return JsonResponse({
+            'success': True,
+            'report': report_data
+        })
+    
+    except Room.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Mission not found or not completed'
+        }, status=404)
+    
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+@api_view(["GET"])
+def get_mission_leaderboard(request, room_id):
+    """
+    Get leaderboard for a specific mission (optional additional endpoint)
+    """
+    try:
+        room = Room.objects.get(room_id=room_id, status='completed')
+        
+        groups = Group.objects.filter(room=room).order_by('-curr_score', 'name')
+        
+        leaderboard = []
+        for idx, group in enumerate(groups, 1):
+            total_responses = GroupResponse.objects.filter(group=group).count()
+            correct_responses = GroupResponse.objects.filter(group=group, is_correct=True).count()
+            accuracy = (correct_responses / total_responses * 100) if total_responses > 0 else 0
+            
+            leaderboard.append({
+                'rank': idx,
+                'group_name': group.name,
+                'score': group.curr_score,
+                'accuracy': round(accuracy, 2),
+                'student_count': len(group.student_names),
+                'student_names': list(group.student_names),
+                'rating_improvement': group.after_rating - group.before_rating
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'leaderboard': leaderboard,
+            'room_info': {
+                'room_code': room.room_code,
+                'quiz_title': room.quiz.title
+            }
+        })
+    
+    except Room.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Mission not found or not completed'
+        }, status=404)
+    
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+

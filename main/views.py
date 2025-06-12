@@ -91,7 +91,7 @@ def get_bonus_question(request, quiz_id):
 
 @api_view(['GET'])
 def give_quizzes(request):
-    quizzes = list(Quiz.objects.all())
+    quizzes = list(Quiz.objects.all().order_by('id'))
     if not quizzes:
         return JsonResponse({'error': 'No quizzes available'}, status=404)
 

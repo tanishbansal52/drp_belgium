@@ -751,3 +751,70 @@ def get_mission_report(request, room_id):
 #             correct_attempts = responses.filter(is_correct=True).count()
 #             accuracy = (correct_attempts / total_attempts * 100) if total_attempts > 0 else 0
 #             avg_response_time = responses.aggregate(avg_time=Avg('response_time'))['avg_time'
+
+
+@api_view(["GET"])
+def get_mission_leaderboard(request, room_id):
+    """
+    Get leaderboard for a specific mission (optional additional endpoint)
+    """
+    try:
+        room = Room.objects.get(room_id=room_id, status='completed')
+        
+        groups = Group.objects.filter(room=room).order_by('-curr_score', 'name')
+        
+        leaderboard = []
+        for idx, group in enumerate(groups, 1):
+            total_responses = GroupResponse.objects.filter(group=group).count()
+            correct_responses = GroupResponse.objects.filter(group=group, is_correct=True).count()
+            accuracy = (correct_responses / total_responses * 100) if total_responses > 0 else 0
+            
+            leaderboard.append({
+                'rank': idx,
+                'group_name': group.name,
+                'score': group.curr_score,
+                'accuracy': round(accuracy, 2),
+                'student_count': len(group.student_names),
+                'student_names': list(group.student_names),
+                'rating_improvement': group.after_rating - group.before_rating
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'leaderboard': leaderboard,
+            'room_info': {
+                'room_code': room.room_code,
+                'quiz_title': room.quiz.title
+            }
+        })
+    
+    except Room.DoesNotExist:
+        return JsonResponse({
+            'success': False,
+            'error': 'Mission not found or not completed'
+        }, status=404)
+    
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=500)
+
+@api_view(['POST'])
+def toggle_spinoff(request, room_code):
+    room = Room.objects.get(room_code=room_code)
+    if not room:
+        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+    room.spinoff_mode = request.data.get("spinoff_mode", False)
+    room.save()
+    print(room.spinoff_mode)
+    return Response({"status": "updated", "spinoff_mode": room.spinoff_mode}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_room_spinoff(request, room_code):
+    try:
+        room = Room.objects.get(room_code=room_code)
+    except Room.DoesNotExist:
+        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    return Response({"spinoff_mode": room.spinoff_mode}, status=status.HTTP_200_OK)

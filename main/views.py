@@ -453,7 +453,7 @@ def get_past_missions(request):
 
 @api_view(["GET"])
 def get_mission_report(request, room_id):
-    # Hardcoded mission report response
+    # Hardcoded mission report response with 3 groups and realistic stats
     return JsonResponse({
         "success": True,
         "report": {
@@ -468,25 +468,25 @@ def get_mission_report(request, room_id):
                 "description": "Solve the puzzles so your robot could thrive."
             },
             "summary_stats": {
-                "total_groups": 1,
-                "average_score": 30.0,
-                "average_before_rating": 1.0,
-                "average_after_rating": 0,
-                "rating_improvement": -1.0
+                "total_groups": 3,
+                "average_score": 45.0,
+                "average_before_rating": 2.0,
+                "average_after_rating": 3.0,
+                "rating_improvement": 1.0
             },
             "group_performance": [
                 {
-                    "group_id": 29,
-                    "group_name": "s",
-                    "student_names": ["s"],
-                    "total_score": 30,
-                    "before_rating": 1,
-                    "after_rating": 0,
-                    "rating_change": -1,
-                    "accuracy_percentage": 100.0,
+                    "group_id": 31,
+                    "group_name": "Math Masters",
+                    "student_names": ["Alice", "Bob"],
+                    "total_score": 60,
+                    "before_rating": 2,
+                    "after_rating": 4,
+                    "rating_change": 2,
+                    "accuracy_percentage": 90.0,
                     "total_responses": 3,
                     "correct_responses": 3,
-                    "average_response_time": 0,
+                    "average_response_time": 12,
                     "question_responses": [
                         {
                             "question_id": 5,
@@ -494,9 +494,9 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "5",
                             "correct_answer": "5",
                             "is_correct": True,
-                            "points_earned": 10,
-                            "max_points": 10,
-                            "response_time": 0
+                            "points_earned": 20,
+                            "max_points": 20,
+                            "response_time": 10
                         },
                         {
                             "question_id": 6,
@@ -504,9 +504,9 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "23",
                             "correct_answer": "23",
                             "is_correct": True,
-                            "points_earned": 10,
-                            "max_points": 10,
-                            "response_time": 0
+                            "points_earned": 20,
+                            "max_points": 20,
+                            "response_time": 15
                         },
                         {
                             "question_id": 7,
@@ -514,9 +514,99 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "8",
                             "correct_answer": "8",
                             "is_correct": True,
-                            "points_earned": 10,
-                            "max_points": 10,
-                            "response_time": 0
+                            "points_earned": 20,
+                            "max_points": 20,
+                            "response_time": 11
+                        }
+                    ]
+                },
+                {
+                    "group_id": 32,
+                    "group_name": "Fraction Force",
+                    "student_names": ["Charlie", "Dana", "Eli"],
+                    "total_score": 45,
+                    "before_rating": 1,
+                    "after_rating": 2,
+                    "rating_change": 1,
+                    "accuracy_percentage": 75.0,
+                    "total_responses": 3,
+                    "correct_responses": 2,
+                    "average_response_time": 14,
+                    "question_responses": [
+                        {
+                            "question_id": 5,
+                            "question_text": "Each team member receives a fragment of the encryption key. Solve your part, then combine them to ge...",
+                            "submitted_answer": "5",
+                            "correct_answer": "5",
+                            "is_correct": True,
+                            "points_earned": 15,
+                            "max_points": 20,
+                            "response_time": 13
+                        },
+                        {
+                            "question_id": 6,
+                            "question_text": "Split into two decoding teams. Each team has one half of a 2-part access code. Use your value of x f...",
+                            "submitted_answer": "20",
+                            "correct_answer": "23",
+                            "is_correct": False,
+                            "points_earned": 0,
+                            "max_points": 20,
+                            "response_time": 16
+                        },
+                        {
+                            "question_id": 7,
+                            "question_text": "The final vault layer is protected by a disguised code. Use your combined code from Level 2 to unloc...",
+                            "submitted_answer": "8",
+                            "correct_answer": "8",
+                            "is_correct": True,
+                            "points_earned": 30,
+                            "max_points": 20,
+                            "response_time": 13
+                        }
+                    ]
+                },
+                {
+                    "group_id": 33,
+                    "group_name": "Percent Pros",
+                    "student_names": ["Fiona", "George"],
+                    "total_score": 30,
+                    "before_rating": 3,
+                    "after_rating": 3,
+                    "rating_change": 0,
+                    "accuracy_percentage": 60.0,
+                    "total_responses": 3,
+                    "correct_responses": 2,
+                    "average_response_time": 18,
+                    "question_responses": [
+                        {
+                            "question_id": 5,
+                            "question_text": "Each team member receives a fragment of the encryption key. Solve your part, then combine them to ge...",
+                            "submitted_answer": "4",
+                            "correct_answer": "5",
+                            "is_correct": False,
+                            "points_earned": 0,
+                            "max_points": 20,
+                            "response_time": 20
+                        },
+                        {
+                            "question_id": 6,
+                            "question_text": "Split into two decoding teams. Each team has one half of a 2-part access code. Use your value of x f...",
+                            "submitted_answer": "23",
+                            "correct_answer": "23",
+                            "is_correct": True,
+                            "points_earned": 15,
+                            "max_points": 20,
+                            "response_time": 17
+                        },
+                        {
+                            "question_id": 7,
+                            "question_text": "The final vault layer is protected by a disguised code. Use your combined code from Level 2 to unloc...",
+                            "submitted_answer": "8",
+                            "correct_answer": "8",
+                            "is_correct": True,
+                            "points_earned": 15,
+                            "max_points": 20,
+                            "response_time": 17
                         }
                     ]
                 }
@@ -526,24 +616,24 @@ def get_mission_report(request, room_id):
                     "question_id": 13,
                     "question_text": "Robot dummy question 1",
                     "correct_answer": "125",
-                    "max_points": 10,
-                    "total_attempts": 0,
-                    "correct_attempts": 0,
-                    "accuracy_percentage": 0,
-                    "average_response_time": 0,
-                    "average_points_earned": 0,
-                    "difficulty_rating": "Hard"
+                    "max_points": 20,
+                    "total_attempts": 3,
+                    "correct_attempts": 2,
+                    "accuracy_percentage": 66.7,
+                    "average_response_time": 15,
+                    "average_points_earned": 10,
+                    "difficulty_rating": "Medium"
                 },
                 {
                     "question_id": 14,
                     "question_text": "Robot dummy question 2",
                     "correct_answer": "125",
-                    "max_points": 10,
-                    "total_attempts": 0,
-                    "correct_attempts": 0,
-                    "accuracy_percentage": 0,
-                    "average_response_time": 0,
-                    "average_points_earned": 0,
+                    "max_points": 20,
+                    "total_attempts": 3,
+                    "correct_attempts": 1,
+                    "accuracy_percentage": 33.3,
+                    "average_response_time": 16,
+                    "average_points_earned": 5,
                     "difficulty_rating": "Hard"
                 }
             ]

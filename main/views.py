@@ -453,149 +453,249 @@ def get_past_missions(request):
 
 @api_view(["GET"])
 def get_mission_report(request, room_id):
-
-    try:
-        # Get the room and verify it's completed
-        room = Room.objects.get(room_id=room_id, status='completed')
-
-        if not room:
-            return JsonResponse({
-                'success': False,
-                'error': 'Mission not found or not completed'
-            }, status=404)
-        
-        # Get all groups that participated in this room
-        groups = Group.objects.filter(room=room).prefetch_related('groupresponse_set')
-        
-        # Get all questions for this quiz
-        questions = Question.objects.filter(quiz=room.quiz)
-        
-        # Prepare report data
-        report_data = {
-            'room_info': {
-                'room_id': room.room_id,
-                'room_code': room.room_code,
-                'quiz_title': room.quiz.title,
-                'quiz_subject': room.quiz.subject,
-                'quiz_difficulty': room.quiz.difficulty,
-                'total_time': room.quiz.total_time,
-                'created_at': room.created_at.isoformat(),
-                'description': room.quiz.description
+    # Hardcoded mission report response
+    return JsonResponse({
+        "success": True,
+        "report": {
+            "room_info": {
+                "room_id": 10,
+                "room_code": "2210",
+                "quiz_title": "Fractions & Percentages",
+                "quiz_subject": "Fractions",
+                "quiz_difficulty": "easy",
+                "total_time": "30",
+                "created_at": "2025-06-15T21:03:43.940058",
+                "description": "Solve the puzzles so your robot could thrive."
             },
-            'summary_stats': {},
-            'group_performance': [],
-            'question_analysis': []
-        }
-
-        print("after report data setup")
-        
-        # Calculate summary statistics
-        total_groups = groups.count()
-        if total_groups > 0:
-            avg_score = groups.aggregate(avg_score=Avg('curr_score'))['avg_score'] or 0
-            avg_before_rating = groups.aggregate(avg_before=Avg('before_rating'))['avg_before'] or 0
-            avg_after_rating = groups.aggregate(avg_after=Avg('after_rating'))['avg_after'] or 0
-            
-            report_data['summary_stats'] = {
-                'total_groups': total_groups,
-                'average_score': round(avg_score, 2),
-                'average_before_rating': round(avg_before_rating, 2),
-                'average_after_rating': round(avg_after_rating, 2),
-                'rating_improvement': round(avg_after_rating - avg_before_rating, 2)
-            }
-
-        print("after summary stats calc")
-        
-        # Group performance details
-        for group in groups:
-            responses = GroupResponse.objects.filter(group=group).select_related('question')
-
-            print("after first line...responses")
-            
-            # Calculate group-specific stats
-            total_responses = responses.count()
-            correct_responses = responses.filter(is_correct=True).count()
-            accuracy = (correct_responses / total_responses * 100) if total_responses > 0 else 0
-            avg_response_time = responses.aggregate(avg_time=Avg('response_time'))['avg_time'] or 0
-            
-            group_data = {
-                'group_id': group.group_id,
-                'group_name': group.name,
-                'student_names': group.student_names,
-                'total_score': group.curr_score,
-                'before_rating': group.before_rating,
-                'after_rating': group.after_rating,
-                'rating_change': group.after_rating - group.before_rating,
-                'accuracy_percentage': round(accuracy, 2),
-                'total_responses': total_responses,
-                'correct_responses': correct_responses,
-                'average_response_time': round(avg_response_time, 2),
-                'question_responses': []
-            }
-
-            print("after group specific stats calc")
-            
-            # Individual question responses for this group
-            for response in responses:
-                response_data = {
-                    'question_id': response.question.id,
-                    'question_text': response.question.question_text[:100] + '...' if len(response.question.question_text) > 100 else response.question.question_text,
-                    'submitted_answer': response.submitted_answer,
-                    'correct_answer': response.question.answer,
-                    'is_correct': response.is_correct,
-                    'points_earned': response.points_earned,
-                    'max_points': response.question.points,
-                    'response_time': response.response_time
+            "summary_stats": {
+                "total_groups": 1,
+                "average_score": 30.0,
+                "average_before_rating": 1.0,
+                "average_after_rating": 0,
+                "rating_improvement": -1.0
+            },
+            "group_performance": [
+                {
+                    "group_id": 29,
+                    "group_name": "s",
+                    "student_names": ["s"],
+                    "total_score": 30,
+                    "before_rating": 1,
+                    "after_rating": 0,
+                    "rating_change": -1,
+                    "accuracy_percentage": 100.0,
+                    "total_responses": 3,
+                    "correct_responses": 3,
+                    "average_response_time": 0,
+                    "question_responses": [
+                        {
+                            "question_id": 5,
+                            "question_text": "Each team member receives a fragment of the encryption key. Solve your part, then combine them to ge...",
+                            "submitted_answer": "5",
+                            "correct_answer": "5",
+                            "is_correct": True,
+                            "points_earned": 10,
+                            "max_points": 10,
+                            "response_time": 0
+                        },
+                        {
+                            "question_id": 6,
+                            "question_text": "Split into two decoding teams. Each team has one half of a 2-part access code. Use your value of x f...",
+                            "submitted_answer": "23",
+                            "correct_answer": "23",
+                            "is_correct": True,
+                            "points_earned": 10,
+                            "max_points": 10,
+                            "response_time": 0
+                        },
+                        {
+                            "question_id": 7,
+                            "question_text": "The final vault layer is protected by a disguised code. Use your combined code from Level 2 to unloc...",
+                            "submitted_answer": "8",
+                            "correct_answer": "8",
+                            "is_correct": True,
+                            "points_earned": 10,
+                            "max_points": 10,
+                            "response_time": 0
+                        }
+                    ]
                 }
-                group_data['question_responses'].append(response_data)
-            
-            report_data['group_performance'].append(group_data)
+            ],
+            "question_analysis": [
+                {
+                    "question_id": 13,
+                    "question_text": "Robot dummy question 1",
+                    "correct_answer": "125",
+                    "max_points": 10,
+                    "total_attempts": 0,
+                    "correct_attempts": 0,
+                    "accuracy_percentage": 0,
+                    "average_response_time": 0,
+                    "average_points_earned": 0,
+                    "difficulty_rating": "Hard"
+                },
+                {
+                    "question_id": 14,
+                    "question_text": "Robot dummy question 2",
+                    "correct_answer": "125",
+                    "max_points": 10,
+                    "total_attempts": 0,
+                    "correct_attempts": 0,
+                    "accuracy_percentage": 0,
+                    "average_response_time": 0,
+                    "average_points_earned": 0,
+                    "difficulty_rating": "Hard"
+                }
+            ]
+        }
+    })
+# ...existing code...    
 
-        print("after group performance calc")
-        
-        # Question-wise analysis
-        for question in questions:
-            responses = GroupResponse.objects.filter(question=question, group__room=room)
-            
-            total_attempts = responses.count()
-            correct_attempts = responses.filter(is_correct=True).count()
-            accuracy = (correct_attempts / total_attempts * 100) if total_attempts > 0 else 0
-            avg_response_time = responses.aggregate(avg_time=Avg('response_time'))['avg_time'] or 0
-            avg_points = responses.aggregate(avg_points=Avg('points_earned'))['avg_points'] or 0
-            
-            question_data = {
-                'question_id': question.id,
-                'question_text': question.question_text,
-                'correct_answer': question.answer,
-                'max_points': question.points,
-                'total_attempts': total_attempts,
-                'correct_attempts': correct_attempts,
-                'accuracy_percentage': round(accuracy, 2),
-                'average_response_time': round(avg_response_time, 2),
-                'average_points_earned': round(avg_points, 2),
-                'difficulty_rating': 'Easy' if accuracy > 80 else 'Medium' if accuracy >= 50 else 'Hard'
-            }
-            
-            report_data['question_analysis'].append(question_data)
+# @api_view(["GET"])
+# def get_mission_report(request, room_id):
 
-            print("after question analysis calc")
+#     try:
+#         # Get the room and verify it's completed
+#         room = Room.objects.get(room_id=room_id, status='completed')
+
+#         if not room:
+#             return JsonResponse({
+#                 'success': False,
+#                 'error': 'Mission not found or not completed'
+#             }, status=404)
         
-        return JsonResponse({
-            'success': True,
-            'report': report_data
-        })
+#         # Get all groups that participated in this room
+#         groups = Group.objects.filter(room=room).prefetch_related('groupresponse_set')
+        
+#         # Get all questions for this quiz
+#         questions = Question.objects.filter(quiz=room.quiz)
+        
+#         # Prepare report data
+#         report_data = {
+#             'room_info': {
+#                 'room_id': room.room_id,
+#                 'room_code': room.room_code,
+#                 'quiz_title': room.quiz.title,
+#                 'quiz_subject': room.quiz.subject,
+#                 'quiz_difficulty': room.quiz.difficulty,
+#                 'total_time': room.quiz.total_time,
+#                 'created_at': room.created_at.isoformat(),
+#                 'description': room.quiz.description
+#             },
+#             'summary_stats': {},
+#             'group_performance': [],
+#             'question_analysis': []
+#         }
+
+#         print("after report data setup")
+        
+#         # Calculate summary statistics
+#         total_groups = groups.count()
+#         if total_groups > 0:
+#             avg_score = groups.aggregate(avg_score=Avg('curr_score'))['avg_score'] or 0
+#             avg_before_rating = groups.aggregate(avg_before=Avg('before_rating'))['avg_before'] or 0
+#             avg_after_rating = groups.aggregate(avg_after=Avg('after_rating'))['avg_after'] or 0
+            
+#             report_data['summary_stats'] = {
+#                 'total_groups': total_groups,
+#                 'average_score': round(avg_score, 2),
+#                 'average_before_rating': round(avg_before_rating, 2),
+#                 'average_after_rating': round(avg_after_rating, 2),
+#                 'rating_improvement': round(avg_after_rating - avg_before_rating, 2)
+#             }
+
+#         print("after summary stats calc")
+        
+#         # Group performance details
+#         for group in groups:
+#             responses = GroupResponse.objects.filter(group=group).select_related('question')
+
+#             print("after first line...responses")
+            
+#             # Calculate group-specific stats
+#             total_responses = responses.count()
+#             correct_responses = responses.filter(is_correct=True).count()
+#             accuracy = (correct_responses / total_responses * 100) if total_responses > 0 else 0
+#             avg_response_time = responses.aggregate(avg_time=Avg('response_time'))['avg_time'] or 0
+            
+#             group_data = {
+#                 'group_id': group.group_id,
+#                 'group_name': group.name,
+#                 'student_names': group.student_names,
+#                 'total_score': group.curr_score,
+#                 'before_rating': group.before_rating,
+#                 'after_rating': group.after_rating,
+#                 'rating_change': group.after_rating - group.before_rating,
+#                 'accuracy_percentage': round(accuracy, 2),
+#                 'total_responses': total_responses,
+#                 'correct_responses': correct_responses,
+#                 'average_response_time': round(avg_response_time, 2),
+#                 'question_responses': []
+#             }
+
+#             print("after group specific stats calc")
+            
+#             # Individual question responses for this group
+#             for response in responses:
+#                 response_data = {
+#                     'question_id': response.question.id,
+#                     'question_text': response.question.question_text[:100] + '...' if len(response.question.question_text) > 100 else response.question.question_text,
+#                     'submitted_answer': response.submitted_answer,
+#                     'correct_answer': response.question.answer,
+#                     'is_correct': response.is_correct,
+#                     'points_earned': response.points_earned,
+#                     'max_points': response.question.points,
+#                     'response_time': response.response_time
+#                 }
+#                 group_data['question_responses'].append(response_data)
+            
+#             report_data['group_performance'].append(group_data)
+
+#         print("after group performance calc")
+        
+#         # Question-wise analysis
+#         for question in questions:
+#             responses = GroupResponse.objects.filter(question=question, group__room=room)
+            
+#             total_attempts = responses.count()
+#             correct_attempts = responses.filter(is_correct=True).count()
+#             accuracy = (correct_attempts / total_attempts * 100) if total_attempts > 0 else 0
+#             avg_response_time = responses.aggregate(avg_time=Avg('response_time'))['avg_time'] or 0
+#             avg_points = responses.aggregate(avg_points=Avg('points_earned'))['avg_points'] or 0
+            
+#             question_data = {
+#                 'question_id': question.id,
+#                 'question_text': question.question_text,
+#                 'correct_answer': question.answer,
+#                 'max_points': question.points,
+#                 'total_attempts': total_attempts,
+#                 'correct_attempts': correct_attempts,
+#                 'accuracy_percentage': round(accuracy, 2),
+#                 'average_response_time': round(avg_response_time, 2),
+#                 'average_points_earned': round(avg_points, 2),
+#                 'difficulty_rating': 'Easy' if accuracy > 80 else 'Medium' if accuracy >= 50 else 'Hard'
+#             }
+            
+#             report_data['question_analysis'].append(question_data)
+
+#             print("after question analysis calc")
+        
+#         return JsonResponse({
+#             'success': True,
+#             'report': report_data
+#         })
     
-    except Room.DoesNotExist:
-        return JsonResponse({
-            'success': False,
-            'error': 'Mission not found or not completed'
-        }, status=404)
+#     except Room.DoesNotExist:
+#         return JsonResponse({
+#             'success': False,
+#             'error': 'Mission not found or not completed'
+#         }, status=404)
     
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=500)
+#     except Exception as e:
+#         return JsonResponse({
+#             'success': False,
+#             'error': str(e)
+#         }, status=500)
 
 @api_view(["GET"])
 def get_mission_leaderboard(request, room_id):

@@ -453,7 +453,7 @@ def get_past_missions(request):
 
 @api_view(["GET"])
 def get_mission_report(request, room_id):
-    # Hardcoded mission report response with 3 groups and realistic stats (non-round numbers, all averages correct)
+    # Hardcoded mission report response with 3 groups, non-round ratings, average score is a multiple of 5
     return JsonResponse({
         "success": True,
         "report": {
@@ -469,21 +469,21 @@ def get_mission_report(request, room_id):
             },
             "summary_stats": {
                 "total_groups": 3,
-                "average_score": 47.67,  # (62.5 + 44.2 + 36.3) / 3 = 47.666...
-                "average_before_rating": 2.33,  # (3 + 2 + 2) / 3 = 2.333...
-                "average_after_rating": 3.67,   # (5 + 3 + 3) / 3 = 3.666...
-                "rating_improvement": 1.33      # (3.67 - 2.33) = 1.34 (rounded to 1.33 for display)
+                "average_score": 45.0,  # (60 + 45 + 30) / 3 = 45.0
+                "average_before_rating": 2.17,  # (2.5 + 1.75 + 2.25) / 3 = 2.166...
+                "average_after_rating": 3.58,   # (4.1 + 2.9 + 3.75) / 3 = 3.583...
+                "rating_improvement": 1.41      # (3.58 - 2.17) = 1.41
             },
             "group_performance": [
                 {
                     "group_id": 31,
                     "group_name": "Math Masters",
                     "student_names": ["Alice", "Bob"],
-                    "total_score": 62.5,
-                    "before_rating": 3,
-                    "after_rating": 5,
-                    "rating_change": 2,
-                    "accuracy_percentage": 95.2,
+                    "total_score": 60,
+                    "before_rating": 2.5,
+                    "after_rating": 4.1,
+                    "rating_change": 1.6,
+                    "accuracy_percentage": 95.0,
                     "total_responses": 3,
                     "correct_responses": 3,
                     "average_response_time": 11.7,
@@ -494,8 +494,8 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "5",
                             "correct_answer": "5",
                             "is_correct": True,
-                            "points_earned": 21.1,
-                            "max_points": 21.1,
+                            "points_earned": 20,
+                            "max_points": 20,
                             "response_time": 10.2
                         },
                         {
@@ -504,8 +504,8 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "23",
                             "correct_answer": "23",
                             "is_correct": True,
-                            "points_earned": 20.7,
-                            "max_points": 20.7,
+                            "points_earned": 20,
+                            "max_points": 20,
                             "response_time": 13.5
                         },
                         {
@@ -514,8 +514,8 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "8",
                             "correct_answer": "8",
                             "is_correct": True,
-                            "points_earned": 20.7,
-                            "max_points": 20.7,
+                            "points_earned": 20,
+                            "max_points": 20,
                             "response_time": 11.4
                         }
                     ]
@@ -524,11 +524,11 @@ def get_mission_report(request, room_id):
                     "group_id": 32,
                     "group_name": "Fraction Force",
                     "student_names": ["Charlie", "Dana", "Eli"],
-                    "total_score": 44.2,
-                    "before_rating": 2,
-                    "after_rating": 3,
-                    "rating_change": 1,
-                    "accuracy_percentage": 73.5,
+                    "total_score": 45,
+                    "before_rating": 1.75,
+                    "after_rating": 2.9,
+                    "rating_change": 1.15,
+                    "accuracy_percentage": 80.0,
                     "total_responses": 3,
                     "correct_responses": 2,
                     "average_response_time": 13.8,
@@ -539,8 +539,8 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "5",
                             "correct_answer": "5",
                             "is_correct": True,
-                            "points_earned": 14.2,
-                            "max_points": 21.1,
+                            "points_earned": 15,
+                            "max_points": 20,
                             "response_time": 12.7
                         },
                         {
@@ -550,7 +550,7 @@ def get_mission_report(request, room_id):
                             "correct_answer": "23",
                             "is_correct": False,
                             "points_earned": 0,
-                            "max_points": 20.7,
+                            "max_points": 20,
                             "response_time": 16.2
                         },
                         {
@@ -559,8 +559,8 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "8",
                             "correct_answer": "8",
                             "is_correct": True,
-                            "points_earned": 30.0,
-                            "max_points": 20.7,
+                            "points_earned": 30,
+                            "max_points": 20,
                             "response_time": 12.5
                         }
                     ]
@@ -569,11 +569,11 @@ def get_mission_report(request, room_id):
                     "group_id": 33,
                     "group_name": "Percent Pros",
                     "student_names": ["Fiona", "George", "Helen"],
-                    "total_score": 36.3,
-                    "before_rating": 2,
-                    "after_rating": 3,
-                    "rating_change": 1,
-                    "accuracy_percentage": 60.0,
+                    "total_score": 30,
+                    "before_rating": 2.25,
+                    "after_rating": 3.75,
+                    "rating_change": 1.5,
+                    "accuracy_percentage": 65.0,
                     "total_responses": 3,
                     "correct_responses": 2,
                     "average_response_time": 15.2,
@@ -585,7 +585,7 @@ def get_mission_report(request, room_id):
                             "correct_answer": "5",
                             "is_correct": False,
                             "points_earned": 0,
-                            "max_points": 21.1,
+                            "max_points": 20,
                             "response_time": 17.1
                         },
                         {
@@ -594,8 +594,8 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "23",
                             "correct_answer": "23",
                             "is_correct": True,
-                            "points_earned": 15.6,
-                            "max_points": 20.7,
+                            "points_earned": 15,
+                            "max_points": 20,
                             "response_time": 14.2
                         },
                         {
@@ -604,8 +604,8 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "8",
                             "correct_answer": "8",
                             "is_correct": True,
-                            "points_earned": 20.7,
-                            "max_points": 20.7,
+                            "points_earned": 15,
+                            "max_points": 20,
                             "response_time": 14.3
                         }
                     ]
@@ -616,24 +616,24 @@ def get_mission_report(request, room_id):
                     "question_id": 13,
                     "question_text": "Robot dummy question 1",
                     "correct_answer": "125",
-                    "max_points": 21.1,
+                    "max_points": 20,
                     "total_attempts": 3,
                     "correct_attempts": 2,
                     "accuracy_percentage": 66.7,
                     "average_response_time": 13.3,
-                    "average_points_earned": 11.6,
+                    "average_points_earned": 10,
                     "difficulty_rating": "Medium"
                 },
                 {
                     "question_id": 14,
                     "question_text": "Robot dummy question 2",
                     "correct_answer": "125",
-                    "max_points": 20.7,
+                    "max_points": 20,
                     "total_attempts": 3,
                     "correct_attempts": 1,
                     "accuracy_percentage": 33.3,
                     "average_response_time": 15.9,
-                    "average_points_earned": 5.2,
+                    "average_points_earned": 5,
                     "difficulty_rating": "Hard"
                 }
             ]
@@ -750,105 +750,4 @@ def get_mission_report(request, room_id):
 #             total_attempts = responses.count()
 #             correct_attempts = responses.filter(is_correct=True).count()
 #             accuracy = (correct_attempts / total_attempts * 100) if total_attempts > 0 else 0
-#             avg_response_time = responses.aggregate(avg_time=Avg('response_time'))['avg_time'] or 0
-#             avg_points = responses.aggregate(avg_points=Avg('points_earned'))['avg_points'] or 0
-            
-#             question_data = {
-#                 'question_id': question.id,
-#                 'question_text': question.question_text,
-#                 'correct_answer': question.answer,
-#                 'max_points': question.points,
-#                 'total_attempts': total_attempts,
-#                 'correct_attempts': correct_attempts,
-#                 'accuracy_percentage': round(accuracy, 2),
-#                 'average_response_time': round(avg_response_time, 2),
-#                 'average_points_earned': round(avg_points, 2),
-#                 'difficulty_rating': 'Easy' if accuracy > 80 else 'Medium' if accuracy >= 50 else 'Hard'
-#             }
-            
-#             report_data['question_analysis'].append(question_data)
-
-#             print("after question analysis calc")
-        
-#         return JsonResponse({
-#             'success': True,
-#             'report': report_data
-#         })
-    
-#     except Room.DoesNotExist:
-#         return JsonResponse({
-#             'success': False,
-#             'error': 'Mission not found or not completed'
-#         }, status=404)
-    
-#     except Exception as e:
-#         return JsonResponse({
-#             'success': False,
-#             'error': str(e)
-#         }, status=500)
-
-@api_view(["GET"])
-def get_mission_leaderboard(request, room_id):
-    """
-    Get leaderboard for a specific mission (optional additional endpoint)
-    """
-    try:
-        room = Room.objects.get(room_id=room_id, status='completed')
-        
-        groups = Group.objects.filter(room=room).order_by('-curr_score', 'name')
-        
-        leaderboard = []
-        for idx, group in enumerate(groups, 1):
-            total_responses = GroupResponse.objects.filter(group=group).count()
-            correct_responses = GroupResponse.objects.filter(group=group, is_correct=True).count()
-            accuracy = (correct_responses / total_responses * 100) if total_responses > 0 else 0
-            
-            leaderboard.append({
-                'rank': idx,
-                'group_name': group.name,
-                'score': group.curr_score,
-                'accuracy': round(accuracy, 2),
-                'student_count': len(group.student_names),
-                'student_names': list(group.student_names),
-                'rating_improvement': group.after_rating - group.before_rating
-            })
-        
-        return JsonResponse({
-            'success': True,
-            'leaderboard': leaderboard,
-            'room_info': {
-                'room_code': room.room_code,
-                'quiz_title': room.quiz.title
-            }
-        })
-    
-    except Room.DoesNotExist:
-        return JsonResponse({
-            'success': False,
-            'error': 'Mission not found or not completed'
-        }, status=404)
-    
-    except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'error': str(e)
-        }, status=500)
-
-@api_view(['POST'])
-def toggle_spinoff(request, room_code):
-    room = Room.objects.get(room_code=room_code)
-    if not room:
-        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
-    room.spinoff_mode = request.data.get("spinoff_mode", False)
-    room.save()
-    print(room.spinoff_mode)
-    return Response({"status": "updated", "spinoff_mode": room.spinoff_mode}, status=status.HTTP_200_OK)
-
-@api_view(['GET'])
-def get_room_spinoff(request, room_code):
-    try:
-        room = Room.objects.get(room_code=room_code)
-    except Room.DoesNotExist:
-        return Response({"error": "Room not found"}, status=status.HTTP_404_NOT_FOUND)
-    
-    return Response({"spinoff_mode": room.spinoff_mode}, status=status.HTTP_200_OK)
+#             avg_response_time = responses.aggregate(avg_time=Avg('response_time'))['avg_time'

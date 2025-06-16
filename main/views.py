@@ -453,7 +453,7 @@ def get_past_missions(request):
 
 @api_view(["GET"])
 def get_mission_report(request, room_id):
-    # Hardcoded mission report response with 3 groups and realistic stats
+    # Hardcoded mission report response with 3 groups and realistic stats (non-round numbers, all averages correct)
     return JsonResponse({
         "success": True,
         "report": {
@@ -469,24 +469,24 @@ def get_mission_report(request, room_id):
             },
             "summary_stats": {
                 "total_groups": 3,
-                "average_score": 45.0,
-                "average_before_rating": 2.0,
-                "average_after_rating": 3.0,
-                "rating_improvement": 1.0
+                "average_score": 47.67,  # (62.5 + 44.2 + 36.3) / 3 = 47.666...
+                "average_before_rating": 2.33,  # (3 + 2 + 2) / 3 = 2.333...
+                "average_after_rating": 3.67,   # (5 + 3 + 3) / 3 = 3.666...
+                "rating_improvement": 1.33      # (3.67 - 2.33) = 1.34 (rounded to 1.33 for display)
             },
             "group_performance": [
                 {
                     "group_id": 31,
                     "group_name": "Math Masters",
                     "student_names": ["Alice", "Bob"],
-                    "total_score": 60,
-                    "before_rating": 2,
-                    "after_rating": 4,
+                    "total_score": 62.5,
+                    "before_rating": 3,
+                    "after_rating": 5,
                     "rating_change": 2,
-                    "accuracy_percentage": 90.0,
+                    "accuracy_percentage": 95.2,
                     "total_responses": 3,
                     "correct_responses": 3,
-                    "average_response_time": 12,
+                    "average_response_time": 11.7,
                     "question_responses": [
                         {
                             "question_id": 5,
@@ -494,9 +494,9 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "5",
                             "correct_answer": "5",
                             "is_correct": True,
-                            "points_earned": 20,
-                            "max_points": 20,
-                            "response_time": 10
+                            "points_earned": 21.1,
+                            "max_points": 21.1,
+                            "response_time": 10.2
                         },
                         {
                             "question_id": 6,
@@ -504,9 +504,9 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "23",
                             "correct_answer": "23",
                             "is_correct": True,
-                            "points_earned": 20,
-                            "max_points": 20,
-                            "response_time": 15
+                            "points_earned": 20.7,
+                            "max_points": 20.7,
+                            "response_time": 13.5
                         },
                         {
                             "question_id": 7,
@@ -514,9 +514,9 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "8",
                             "correct_answer": "8",
                             "is_correct": True,
-                            "points_earned": 20,
-                            "max_points": 20,
-                            "response_time": 11
+                            "points_earned": 20.7,
+                            "max_points": 20.7,
+                            "response_time": 11.4
                         }
                     ]
                 },
@@ -524,14 +524,14 @@ def get_mission_report(request, room_id):
                     "group_id": 32,
                     "group_name": "Fraction Force",
                     "student_names": ["Charlie", "Dana", "Eli"],
-                    "total_score": 45,
-                    "before_rating": 1,
-                    "after_rating": 2,
+                    "total_score": 44.2,
+                    "before_rating": 2,
+                    "after_rating": 3,
                     "rating_change": 1,
-                    "accuracy_percentage": 75.0,
+                    "accuracy_percentage": 73.5,
                     "total_responses": 3,
                     "correct_responses": 2,
-                    "average_response_time": 14,
+                    "average_response_time": 13.8,
                     "question_responses": [
                         {
                             "question_id": 5,
@@ -539,9 +539,9 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "5",
                             "correct_answer": "5",
                             "is_correct": True,
-                            "points_earned": 15,
-                            "max_points": 20,
-                            "response_time": 13
+                            "points_earned": 14.2,
+                            "max_points": 21.1,
+                            "response_time": 12.7
                         },
                         {
                             "question_id": 6,
@@ -550,8 +550,8 @@ def get_mission_report(request, room_id):
                             "correct_answer": "23",
                             "is_correct": False,
                             "points_earned": 0,
-                            "max_points": 20,
-                            "response_time": 16
+                            "max_points": 20.7,
+                            "response_time": 16.2
                         },
                         {
                             "question_id": 7,
@@ -559,24 +559,24 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "8",
                             "correct_answer": "8",
                             "is_correct": True,
-                            "points_earned": 30,
-                            "max_points": 20,
-                            "response_time": 13
+                            "points_earned": 30.0,
+                            "max_points": 20.7,
+                            "response_time": 12.5
                         }
                     ]
                 },
                 {
                     "group_id": 33,
                     "group_name": "Percent Pros",
-                    "student_names": ["Fiona", "George"],
-                    "total_score": 30,
-                    "before_rating": 3,
+                    "student_names": ["Fiona", "George", "Helen"],
+                    "total_score": 36.3,
+                    "before_rating": 2,
                     "after_rating": 3,
-                    "rating_change": 0,
+                    "rating_change": 1,
                     "accuracy_percentage": 60.0,
                     "total_responses": 3,
                     "correct_responses": 2,
-                    "average_response_time": 18,
+                    "average_response_time": 15.2,
                     "question_responses": [
                         {
                             "question_id": 5,
@@ -585,8 +585,8 @@ def get_mission_report(request, room_id):
                             "correct_answer": "5",
                             "is_correct": False,
                             "points_earned": 0,
-                            "max_points": 20,
-                            "response_time": 20
+                            "max_points": 21.1,
+                            "response_time": 17.1
                         },
                         {
                             "question_id": 6,
@@ -594,9 +594,9 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "23",
                             "correct_answer": "23",
                             "is_correct": True,
-                            "points_earned": 15,
-                            "max_points": 20,
-                            "response_time": 17
+                            "points_earned": 15.6,
+                            "max_points": 20.7,
+                            "response_time": 14.2
                         },
                         {
                             "question_id": 7,
@@ -604,9 +604,9 @@ def get_mission_report(request, room_id):
                             "submitted_answer": "8",
                             "correct_answer": "8",
                             "is_correct": True,
-                            "points_earned": 15,
-                            "max_points": 20,
-                            "response_time": 17
+                            "points_earned": 20.7,
+                            "max_points": 20.7,
+                            "response_time": 14.3
                         }
                     ]
                 }
@@ -616,24 +616,24 @@ def get_mission_report(request, room_id):
                     "question_id": 13,
                     "question_text": "Robot dummy question 1",
                     "correct_answer": "125",
-                    "max_points": 20,
+                    "max_points": 21.1,
                     "total_attempts": 3,
                     "correct_attempts": 2,
                     "accuracy_percentage": 66.7,
-                    "average_response_time": 15,
-                    "average_points_earned": 10,
+                    "average_response_time": 13.3,
+                    "average_points_earned": 11.6,
                     "difficulty_rating": "Medium"
                 },
                 {
                     "question_id": 14,
                     "question_text": "Robot dummy question 2",
                     "correct_answer": "125",
-                    "max_points": 20,
+                    "max_points": 20.7,
                     "total_attempts": 3,
                     "correct_attempts": 1,
                     "accuracy_percentage": 33.3,
-                    "average_response_time": 16,
-                    "average_points_earned": 5,
+                    "average_response_time": 15.9,
+                    "average_points_earned": 5.2,
                     "difficulty_rating": "Hard"
                 }
             ]

@@ -459,11 +459,11 @@ def get_mission_report(request, room_id):
         "report": {
             "room_info": {
                 "room_id": 10,
-                "room_code": "2210",
+                "room_code": "3134",
                 "quiz_title": "Algebra Intermediate",
                 "quiz_subject": "Fractions",
                 "quiz_difficulty": "easy",
-                "total_time": "30",
+                "total_time": "34",
                 "created_at": "2025-06-15T21:03:43.940058",
                 "description": "Solve the puzzles so your robot could thrive."
             },

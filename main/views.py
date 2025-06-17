@@ -613,27 +613,39 @@ def get_mission_report(request, room_id):
             ],
             "question_analysis": [
                 {
-                    "question_id": 13,
-                    "question_text": "Question 1",
-                    "correct_answer": "125",
+                    "question_id": 5,
+                    "question_text": "Each team member receives a fragment of the encryption key. Solve your part, then combine them to ge...",
+                    "correct_answer": "5",
                     "max_points": 20,
                     "total_attempts": 3,
                     "correct_attempts": 2,
-                    "accuracy_percentage": 66.7,
-                    "average_response_time": 13.3,
-                    "average_points_earned": 10,
+                    "accuracy_percentage": 66.7,  # 2/3 correct
+                    "average_response_time": 13.3,  # (10.2 + 12.7 + 17.1) / 3
+                    "average_points_earned": 11.67, # (20 + 15 + 0) / 3
+                    "difficulty_rating": "Easy"
+                },
+                {
+                    "question_id": 6,
+                    "question_text": "Split into two decoding teams. Each team has one half of a 2-part access code. Use your value of x f...",
+                    "correct_answer": "23",
+                    "max_points": 20,
+                    "total_attempts": 3,
+                    "correct_attempts": 2,
+                    "accuracy_percentage": 66.7,  # 2/3 correct
+                    "average_response_time": 14.63,  # (13.5 + 16.2 + 14.2) / 3
+                    "average_points_earned": 11.67, # (20 + 0 + 15) / 3
                     "difficulty_rating": "Medium"
                 },
                 {
-                    "question_id": 14,
-                    "question_text": "Question 2",
-                    "correct_answer": "125",
+                    "question_id": 7,
+                    "question_text": "The final vault layer is protected by a disguised code. Use your combined code from Level 2 to unloc...",
+                    "correct_answer": "8",
                     "max_points": 20,
                     "total_attempts": 3,
-                    "correct_attempts": 1,
-                    "accuracy_percentage": 33.3,
-                    "average_response_time": 15.9,
-                    "average_points_earned": 5,
+                    "correct_attempts": 3,
+                    "accuracy_percentage": 100.0,  # 3/3 correct
+                    "average_response_time": 12.73,  # (11.4 + 12.5 + 14.3) / 3
+                    "average_points_earned": 21.67, # (20 + 30 + 15) / 3
                     "difficulty_rating": "Hard"
                 }
             ]

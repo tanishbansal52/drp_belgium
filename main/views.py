@@ -462,10 +462,10 @@ def get_mission_report(request, room_id):
                 "room_code": "3134",
                 "quiz_title": "Algebra Intermediate",
                 "quiz_subject": "Algebra",
-                "quiz_difficulty": "easy",
-                "total_time": "34",
+                "quiz_difficulty": "medium",
+                "total_time": "40",
                 "created_at": "2025-06-15T21:03:43.940058",
-                "description": "Solve the puzzles so your robot could thrive."
+                "description": "Solve the puzzles to unlock the vault."
             },
             "summary_stats": {
                 "total_groups": 3,

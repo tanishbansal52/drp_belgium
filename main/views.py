@@ -460,7 +460,7 @@ def get_mission_report(request, room_id):
             "room_info": {
                 "room_id": 10,
                 "room_code": "2210",
-                "quiz_title": "Fractions & Percentages",
+                "quiz_title": "Algebra Intermediate",
                 "quiz_subject": "Fractions",
                 "quiz_difficulty": "easy",
                 "total_time": "30",

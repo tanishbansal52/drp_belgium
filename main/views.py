@@ -461,7 +461,7 @@ def get_mission_report(request, room_id):
                 "room_id": 10,
                 "room_code": "3134",
                 "quiz_title": "Algebra Intermediate",
-                "quiz_subject": "Fractions",
+                "quiz_subject": "Algebra",
                 "quiz_difficulty": "easy",
                 "total_time": "34",
                 "created_at": "2025-06-15T21:03:43.940058",

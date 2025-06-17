@@ -614,7 +614,7 @@ def get_mission_report(request, room_id):
             "question_analysis": [
                 {
                     "question_id": 13,
-                    "question_text": "Robot dummy question 1",
+                    "question_text": "Question 1",
                     "correct_answer": "125",
                     "max_points": 20,
                     "total_attempts": 3,
@@ -626,7 +626,7 @@ def get_mission_report(request, room_id):
                 },
                 {
                     "question_id": 14,
-                    "question_text": "Robot dummy question 2",
+                    "question_text": "Question 2",
                     "correct_answer": "125",
                     "max_points": 20,
                     "total_attempts": 3,

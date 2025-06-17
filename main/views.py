@@ -478,7 +478,7 @@ def get_mission_report(request, room_id):
                 {
                     "group_id": 31,
                     "group_name": "Math Masters",
-                    "student_names": ["Alice", "Bob"],
+                    "student_names": ["Angelina", "Barry"],
                     "total_score": 60,
                     "before_rating": 2.5,
                     "after_rating": 4.1,
